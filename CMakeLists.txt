@@ -24,7 +24,5 @@ target_link_libraries(pytschirp PRIVATE juce-utils midikraft-base midikraft-sequ
 set_target_properties(pytschirp PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                          SUFFIX "${PYTHON_MODULE_EXTENSION}")
 
-
-#pybind11_add_module(pytschirp_rev2 PyTschirp-sequential-rev2.cpp)
-#target_link_libraries(pytschirp_rev2 juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES})
-
+add_executable(testExe test.cpp)
+target_link_libraries(testExe PRIVATE juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES})
