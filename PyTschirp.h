@@ -4,6 +4,7 @@
 
 #include "SynthParameterDefinition.h"
 #include "Patch.h"
+#include "AutoDetection.h"
 
 #include <algorithm>
 
@@ -126,11 +127,19 @@ public:
 	}
 
 	void detect() {
-
+		std::vector<std::shared_ptr<midikraft::SimpleDiscoverableDevice>> list;
+		list.push_back(synth_);
+		midikraft::AutoDetection autodetection;
+		autodetection.autoconfigure(list);
 	}
 
 	bool detected() {
 		return synth_->channel().isValid();
+	}
+
+	std::string location() const {
+		auto result = String("MIDI IN: ") + synth_->midiInput() + String(", MIDI OUT: ") + synth_->midiOutput();
+		return result.toStdString();
 	}
 
 private:

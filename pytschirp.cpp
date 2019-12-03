@@ -1,11 +1,21 @@
 #include "PyTschirp.h"
 
+#include "Logger.h"
+
 #include "Rev2.h"
 #include "Rev2Patch.h"
 
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
+
+// We will need a PythonLogger to get any debug output
+class PythonLogger : public SimpleLogger {
+public:
+	virtual void postMessage(const String& message) override {
+		std::cout << message << std::endl;
+	}
+};
 
 // Configure the template with the various classes for the Rev2
 typedef PyTschirpAttribute<midikraft::Rev2Patch, midikraft::Rev2ParamDefinition, std::string> PyAttribute_Rev2;
@@ -37,9 +47,18 @@ PYBIND11_MODULE(pytschirp, m) {
 	pyTschirpSynth
 		.def(py::init<>())
 		.def("detect", &PyTschirpSynth_Rev2::detect)
-		.def("detected", &PyTschirpSynth_Rev2::detected);
+		.def("detected", &PyTschirpSynth_Rev2::detected)
+		.def("location", &PyTschirpSynth_Rev2::location);
 
-	//py::class_<Matrix1000ParamDefinition> matrix1000ParamDefinition(m, "Matrix1000ParamDefinition");
+	// Fire up Singletons used by the frameworks we need
+	new PythonLogger();
+
+	// For use in PyTschirp, we need to lazily create the MidiController Singleton so it is in the right heap
+	if (!midikraft::MidiController::instance()) {
+		new midikraft::MidiController();
+	}
+	// And JUCE itself might not be fired up, so let's do that!
+	juce::MessageManager::getInstance();
 }
 
 
