@@ -17,14 +17,18 @@ PYBIND11_MODULE(pytschirp, m) {
 
 	py::class_<PyTschirp_Rev2> rev2_tschirp(m, "Rev2Patch");
 	rev2_tschirp.def(py::init<>())
-		.def("attr", &PyTschirp_Rev2::attr);
+		.def("attr", &PyTschirp_Rev2::attr)
+		.def("__getattr__", &PyTschirp_Rev2::get_attr)
+		.def("__setattr__", &PyTschirp_Rev2::set_attr);
 				
 	py::class_<PyAttribute_Rev2> rev2_attribute(m, "Rev2Attribute");
 	rev2_attribute.def("set", py::overload_cast<bool>(&PyAttribute_Rev2::set))
 		.def("set", py::overload_cast<int>(&PyAttribute_Rev2::set))
 		.def("get", &PyAttribute_Rev2::get)
 		.def("asText", &PyAttribute_Rev2::asText)
+		.def("__repr__", &PyAttribute_Rev2::asText)
 		;
+	py::class_<PyTschirpInvalidAttribute> pyTschirpInvalidAttribute(m, "InvalidAttribute");
 
 	//py::class_<Matrix1000ParamDefinition> matrix1000ParamDefinition(m, "Matrix1000ParamDefinition");
 }

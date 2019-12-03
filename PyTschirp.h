@@ -3,6 +3,16 @@
 #include "SynthParameterDefinition.h"
 #include "Patch.h"
 
+#include <algorithm>
+
+class PyTschirpInvalidAttribute {
+public:
+	void set(int newValue) {
+		ignoreUnused(newValue);
+		throw new std::runtime_error("Can't set value of invalid attribute");
+	}
+};
+
 template<typename PATCH, typename SYNTHPARAM, typename PARAM_ID>
 class PyTschirpAttribute {
 public:
@@ -46,7 +56,34 @@ public:
 		return ATTRIBUTE(patch, param);
 	}
 
+	ATTRIBUTE get_attr(std::string const &attrName) {
+		try {
+			return ATTRIBUTE(patch, attrName);
+		}
+		catch (std::runtime_error &) {
+			// That doesn't seem to exist... try with spaces instead of underscores in the name
+			return ATTRIBUTE(patch, underscoreToSpace(attrName));
+		}
+	}
+
+	void set_attr(std::string const &name, int value) {
+		try {
+			auto attr = ATTRIBUTE(patch, name);
+			attr.set(value);
+		}
+		catch (std::runtime_error &) {
+			auto attr = ATTRIBUTE(patch, underscoreToSpace(name));
+			attr.set(value);
+		}
+	}
+
 private:
+	std::string underscoreToSpace(std::string const &input) {
+		auto copy = input;
+		std::replace(copy.begin(), copy.end(), '_', ' ');
+		return copy;
+	}
+
 	std::shared_ptr<PATCH> patch;
 };
 
