@@ -12,7 +12,7 @@ typedef PyTschirpAttribute<midikraft::Rev2Patch, midikraft::Rev2ParamDefinition,
 
 typedef PyTschirp<midikraft::Rev2Patch, PyAttribute_Rev2, std::string> PyTschirp_Rev2;
 
-PYBIND11_MODULE(matrix1000, m) {
+PYBIND11_MODULE(pytschirp, m) {
 	m.doc() = "Provide PyTschirp bindings for the Sequential Prophet Rev2";
 
 	py::class_<PyTschirp_Rev2> rev2_tschirp(m, "Rev2Patch");
@@ -28,3 +28,5 @@ PYBIND11_MODULE(matrix1000, m) {
 
 	//py::class_<Matrix1000ParamDefinition> matrix1000ParamDefinition(m, "Matrix1000ParamDefinition");
 }
+
+

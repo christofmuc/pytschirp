@@ -16,11 +16,11 @@ ENDIF()
 
 set(SOURCES
 	PyTschirp.h
-	PyTschirp-sequential-rev2.cpp
+	pytschirp.cpp
 )
 
-add_library(pytschirp ${SOURCES})
-target_link_libraries(pytschirp ${SOURCES} juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES} pybind11::module)
+pybind11_add_module(pytschirp ${SOURCES})
+target_link_libraries(pytschirp PRIVATE juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES})
 set_target_properties(pytschirp PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                          SUFFIX "${PYTHON_MODULE_EXTENSION}")
 
