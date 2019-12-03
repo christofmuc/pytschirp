@@ -12,6 +12,8 @@ typedef PyTschirpAttribute<midikraft::Rev2Patch, midikraft::Rev2ParamDefinition,
 
 typedef PyTschirp<midikraft::Rev2Patch, PyAttribute_Rev2, std::string> PyTschirp_Rev2;
 
+typedef PyTschirpSynth<midikraft::Rev2> PyTschirpSynth_Rev2;
+
 PYBIND11_MODULE(pytschirp, m) {
 	m.doc() = "Provide PyTschirp bindings for the Sequential Prophet Rev2";
 
@@ -30,6 +32,12 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def("__repr__", &PyAttribute_Rev2::asText)
 		;
 	py::class_<PyTschirpInvalidAttribute> pyTschirpInvalidAttribute(m, "InvalidAttribute");
+
+	py::class_<PyTschirpSynth_Rev2> pyTschirpSynth(m, "Rev2");
+	pyTschirpSynth
+		.def(py::init<>())
+		.def("detect", &PyTschirpSynth_Rev2::detect)
+		.def("detected", &PyTschirpSynth_Rev2::detected);
 
 	//py::class_<Matrix1000ParamDefinition> matrix1000ParamDefinition(m, "Matrix1000ParamDefinition");
 }

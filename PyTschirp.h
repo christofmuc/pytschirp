@@ -118,4 +118,21 @@ private:
 	std::shared_ptr<PATCH> patch;
 };
 
+template<typename SYNTH>
+class PyTschirpSynth {
+public:
+	PyTschirpSynth() {
+		synth_ = std::make_shared<SYNTH>();
+	}
 
+	void detect() {
+
+	}
+
+	bool detected() {
+		return synth_->channel().isValid();
+	}
+
+private:
+	std::shared_ptr<SYNTH> synth_;
+};
