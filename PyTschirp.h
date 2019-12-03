@@ -1,9 +1,13 @@
 #pragma once
 
+#include <pybind11/pybind11.h>
+
 #include "SynthParameterDefinition.h"
 #include "Patch.h"
 
 #include <algorithm>
+
+namespace py = pybind11;
 
 class PyTschirpInvalidAttribute {
 public:
@@ -19,11 +23,38 @@ public:
 	PyTschirpAttribute(std::shared_ptr<PATCH> patch, PARAM_ID const &param) : patch_(patch), def_(PATCH::find(param)) {
 	}
 
-	void set(bool newValue) {
+	void set(int value) {
+		// Depending on what type this object is, we might be successful or not
+		
+		if  (py::int_(value).check()) {
+			// This is an integer, use the integer setter
+			int v = py::int_(value);
+			setV(v);
+		}
+		else {
+			throw std::runtime_error("PyTschirp: Type can not be set to parameter");
+		}
+	}
+
+	void set(py::list newlist) {
+		// Ups, this is a list. Only some synth parameters are lists (e.g. gated sequencer data), so we need some additional 
+		// checks before we can set this...
+		if (def_->sysexIndex() != def_->endSysexIndex()) {
+			// This is indeed an array type of synth parameter
+			if (py::len(newlist) != (def_->endSysexIndex() - def_->sysexIndex() + 1)) {
+				throw std::runtime_error("PyTschirp: List length doesn't match parameter length");
+			}
+		}
+		else {
+			throw std::runtime_error("PyTschirp: Type can not be set to list");
+		}
+	}
+
+	void setV(bool newValue) {
 		patch_->setAt(def_->sysexIndex(), newValue ? 1 : 0);
 	}
 
-	void set(int newValue) {
+	void setV(int newValue) {
 		patch_->setAt(def_->sysexIndex(), newValue);
 	}
 
@@ -69,11 +100,11 @@ public:
 	void set_attr(std::string const &name, int value) {
 		try {
 			auto attr = ATTRIBUTE(patch, name);
-			attr.set(value);
+			attr.setV(value);
 		}
 		catch (std::runtime_error &) {
 			auto attr = ATTRIBUTE(patch, underscoreToSpace(name));
-			attr.set(value);
+			attr.setV(value);
 		}
 	}
 
