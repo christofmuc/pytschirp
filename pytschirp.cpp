@@ -1,4 +1,6 @@
 #include "PyTschirp.h"
+#include "PyTschirpAttribute.h"
+#include "PyTschirpSynth.h"
 
 #include "Logger.h"
 
@@ -20,7 +22,7 @@ public:
 // Configure the template with the various classes for the Rev2
 typedef PyTschirpAttribute<midikraft::Rev2Patch, midikraft::Rev2ParamDefinition, std::string> PyAttribute_Rev2;
 
-typedef PyTschirp<midikraft::Rev2Patch, PyAttribute_Rev2, std::string> PyTschirp_Rev2;
+typedef PyTschirp<midikraft::Rev2Patch, PyAttribute_Rev2> PyTschirp_Rev2;
 
 typedef PyTschirpSynth<midikraft::Rev2, PyTschirp_Rev2> PyTschirpSynth_Rev2;
 
