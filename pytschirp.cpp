@@ -43,6 +43,8 @@ PYBIND11_MODULE(pytschirp, m) {
 		;
 	py::class_<PyTschirpInvalidAttribute> pyTschirpInvalidAttribute(m, "InvalidAttribute");
 
+	// Ints as text
+
 	py::class_<PyTschirpSynth_Rev2> pyTschirpSynth(m, "Rev2");
 	pyTschirpSynth
 		.def(py::init<>())
@@ -50,6 +52,13 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def("detected", &PyTschirpSynth_Rev2::detected)
 		.def("location", &PyTschirpSynth_Rev2::location)
 		.def("editBuffer", &PyTschirpSynth_Rev2::editBuffer);
+
+	// TODO
+	// sendPatchToEditBuffer
+	// sendPatchToStoragePlace
+	// savePatchAsSysex
+	// loadSysex (Patch or vector of Patches)
+	// make Patch "live" - all changes are sent as NRPNs directly to the synth
 
 	// Fire up Singletons used by the frameworks we need
 	new PythonLogger();
