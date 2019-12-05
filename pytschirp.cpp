@@ -22,7 +22,7 @@ typedef PyTschirpAttribute<midikraft::Rev2Patch, midikraft::Rev2ParamDefinition,
 
 typedef PyTschirp<midikraft::Rev2Patch, PyAttribute_Rev2, std::string> PyTschirp_Rev2;
 
-typedef PyTschirpSynth<midikraft::Rev2> PyTschirpSynth_Rev2;
+typedef PyTschirpSynth<midikraft::Rev2, PyTschirp_Rev2> PyTschirpSynth_Rev2;
 
 PYBIND11_MODULE(pytschirp, m) {
 	m.doc() = "Provide PyTschirp bindings for the Sequential Prophet Rev2";
@@ -48,7 +48,8 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def(py::init<>())
 		.def("detect", &PyTschirpSynth_Rev2::detect)
 		.def("detected", &PyTschirpSynth_Rev2::detected)
-		.def("location", &PyTschirpSynth_Rev2::location);
+		.def("location", &PyTschirpSynth_Rev2::location)
+		.def("editBuffer", &PyTschirpSynth_Rev2::editBuffer);
 
 	// Fire up Singletons used by the frameworks we need
 	new PythonLogger();
