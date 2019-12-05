@@ -173,6 +173,21 @@ public:
 		}
 	}
 
+	std::string layerName(int layerNo) {
+		auto layeredPatch = std::dynamic_pointer_cast<midikraft::LayeredPatch>(patch);
+		if (layeredPatch) {
+			if (layerNo >= 0 && layerNo < layeredPatch->numberOfLayers()) {
+				return layeredPatch->layerName(layerNo);
+			}
+			throw std::runtime_error("PyTschirp: Invalid layer number given to layerName()");
+		}
+		if (layerNo == 0) {
+			// Not a layered patch, but hey, layer 0 is good
+			return patch->patchName();
+		}
+		throw std::runtime_error("PyTschirp: This is not a layered patch, can't retrieve name of layer");
+	}
+
 private:
 	std::string underscoreToSpace(std::string const &input) {
 		auto copy = input;

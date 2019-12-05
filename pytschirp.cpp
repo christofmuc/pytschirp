@@ -31,7 +31,12 @@ PYBIND11_MODULE(pytschirp, m) {
 	rev2_tschirp.def(py::init<>())
 		.def("attr", &PyTschirp_Rev2::attr)
 		.def("__getattr__", &PyTschirp_Rev2::get_attr)
-		.def("__setattr__", &PyTschirp_Rev2::set_attr);
+		.def("__setattr__", &PyTschirp_Rev2::set_attr)
+		.def("layerName", &PyTschirp_Rev2::layerName);
+
+	//TODO
+	// set name of patch/layer
+	// get list of attributes
 				
 	py::class_<PyAttribute_Rev2> rev2_attribute(m, "Rev2Attribute");
 	rev2_attribute
