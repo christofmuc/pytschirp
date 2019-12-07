@@ -14,6 +14,7 @@
 #include "Rev2Patch.h"
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h> // For vector to list
 
 namespace py = pybind11;
 
@@ -39,7 +40,8 @@ PYBIND11_MODULE(pytschirp, m) {
 	rev2_tschirp.def(py::init<>())
 		.def("attr", &PyTschirp_Rev2::attr)
 		.def("__getattr__", &PyTschirp_Rev2::get_attr)
-		.def("__setattr__", &PyTschirp_Rev2::set_attr)
+		.def("__setattr__", py::overload_cast<std::string const &, int>(&PyTschirp_Rev2::set_attr))
+		.def("__setattr__", py::overload_cast<std::string const &, std::vector<int> const &>(&PyTschirp_Rev2::set_attr))
 		.def("layerName", &PyTschirp_Rev2::layerName);
 
 	//TODO
@@ -71,7 +73,7 @@ PYBIND11_MODULE(pytschirp, m) {
 	// sendPatchToStoragePlace
 	// savePatchAsSysex
 	// loadSysex (Patch or vector of Patches)
-	// make Patch "live" - all changes are sent as NRPNs directly to the synth
+	// get specific patch at specific location
 
 	// Fire up Singletons used by the frameworks we need
 	new PythonLogger();
