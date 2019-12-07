@@ -23,51 +23,59 @@ public:
 	}
 
 	void set(int value) {
-		// Depending on what type this object is, we might be successful or not
-
-		if (py::int_(value).check()) {
-			// This is an integer, use the integer setter
-			int v = py::int_(value);
-			setV(v);
-		}
-		else {
-			throw std::runtime_error("PyTschirp: Type can not be set to parameter");
-		}
+		def_->setInPatch(*patch_, value);
 	}
 
 	void set(py::list newlist) {
-		// Ups, this is a list. Only some synth parameters are lists (e.g. gated sequencer data), so we need some additional 
-		// checks before we can set this...
-		if (def_->sysexIndex() != def_->endSysexIndex()) {
-			// This is indeed an array type of synth parameter
-			if (py::len(newlist) != (def_->endSysexIndex() - def_->sysexIndex() + 1)) {
-				throw std::runtime_error("PyTschirp: List length doesn't match parameter length");
+		std::vector<int> data;
+		for (size_t i = 0; i < newlist.size(); i++) {
+			if (py::int_(newlist[i]).check()) {
+				data.push_back(py::int_(newlist[i]));
+			}
+			else {
+				throw std::runtime_error("PyTschirp: Only lists of integers can be used as parameters!");
 			}
 		}
-		else {
-			throw std::runtime_error("PyTschirp: Type can not be set to list");
-		}
+		def_->setInPatch(*patch_, data);
 	}
 
 	void setV(bool newValue) {
-		patch_->setAt(def_->sysexIndex(), newValue ? 1 : 0);
+		def_->setInPatch(*patch_, newValue ? 1 : 0);
 	}
 
 	void setV(int newValue) {
-		patch_->setAt(def_->sysexIndex(), newValue);
+		
 	}
 
-	int get() const {
-		int value;
-		if (def_->valueInPatch(*patch_, value)) {
-			return value;
+	void setV(int newValue, int relIndex) {
+		if (def_->sysexIndex() + relIndex > def_->endSysexIndex()) {
+			throw std::runtime_error("PyTschirp: Index out of range");
+		}
+		patch_->setAt(def_->sysexIndex() + relIndex, newValue);
+	}
+
+	py::object get() const {
+		if (def_->type() == midikraft::SynthParameterDefinition::ParamType::INT_ARRAY) {
+			std::vector<int> value;
+			if (!def_->valueInPatch(*patch_, value)) {
+				throw std::runtime_error("PyTschirp: Internal error getting array from patch data!");
+			}
+			py::list result;
+			for (auto val : value) result.append(val);
+			return result;
+		}
+		else {
+			int value;
+			if (def_->valueInPatch(*patch_, value)) {
+				return py::int_(value);
+			}
 		}
 		// Invalid
-		throw new std::runtime_error("PyTschirp: Invalid attribute index in patch");
+		throw std::runtime_error("PyTschirp: Invalid attribute index in patch");
 	}
 
 	std::string asText() const {
-		return def_->valueAsText(get());
+		return "not implemented"; // def_->valueAsText(get());
 	}
 
 	// Bindings not for python
