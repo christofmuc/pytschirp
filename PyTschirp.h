@@ -54,9 +54,12 @@ public:
 			auto attr = ATTRIBUTE(patch_, name);
 			attr.setV(value);
 			if (!synth_.expired() && synth_.lock()->channel().isValid()) {
-				// The synth is hot... we don't know if this patch is currently selected, but let's send the nrpn or other value changing message anyway!
-				auto messages = attr.def()->setValueMessage(*patch_, synth_.lock().get());
-				midikraft::MidiController::instance()->getMidiOutput(synth_.lock()->midiOutput())->sendBlockOfMessagesNow(messages);
+				auto liveEditing = std::dynamic_pointer_cast<midikraft::SynthParameterLiveEditCapability>(attr.def());
+				if (liveEditing) {
+					// The synth is hot... we don't know if this patch is currently selected, but let's send the nrpn or other value changing message anyway!
+					auto messages = liveEditing->setValueMessages(*patch_, synth_.lock().get());
+					midikraft::MidiController::instance()->getMidiOutput(synth_.lock()->midiOutput())->sendBlockOfMessagesNow(messages);
+				}
 			}
 		}
 		catch (std::runtime_error &) {
@@ -68,16 +71,16 @@ public:
 	void set_attr(std::string const &name, std::vector<int> const &value) {
 		try {
 			auto attr = ATTRIBUTE(patch_, name);
-			int readindex = 0;
-			for (int index = attr.def()->sysexIndex(); index <= attr.def()->endSysexIndex(); index++) {
-				int v = value[readindex++];
-				attr.setV(v, index - attr.def()->sysexIndex());
-				if (!synth_.expired() && synth_.lock()->channel().isValid()) {
+			attr.set(value);
+			
+			if (!synth_.expired() && synth_.lock()->channel().isValid()) {
+				auto liveEditing = std::dynamic_pointer_cast<midikraft::SynthParameterLiveEditCapability>(attr.def());
+				if (liveEditing) {
 					// The synth is hot... we don't know if this patch is currently selected, but let's send the nrpn or other value changing message anyway!
-					auto messages = attr.def()->setValueMessage(*patch_, synth_.lock().get());
+					auto messages = liveEditing->setValueMessages(*patch_, synth_.lock().get());
 					midikraft::MidiController::instance()->getMidiOutput(synth_.lock()->midiOutput())->sendBlockOfMessagesNow(messages);
 				}
-			}			
+			}
 		}
 		catch (std::runtime_error &) {
 			auto attr = ATTRIBUTE(patch_, underscoreToSpace(name));

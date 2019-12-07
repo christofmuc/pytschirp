@@ -53,7 +53,7 @@ PYBIND11_MODULE(pytschirp, m) {
 	py::class_<PyAttribute_Rev2> rev2_attribute(m, "Rev2Attribute");
 	rev2_attribute
 		.def("set", py::overload_cast<int>(&PyAttribute_Rev2::set))
-		.def("set", py::overload_cast<py::list>(&PyAttribute_Rev2::set))
+		.def("set", py::overload_cast<std::vector<int>>(&PyAttribute_Rev2::set))
 		.def("get", &PyAttribute_Rev2::get)
 		.def("asText", &PyAttribute_Rev2::asText)
 		.def("__repr__", &PyAttribute_Rev2::asText)

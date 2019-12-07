@@ -23,20 +23,23 @@ public:
 	}
 
 	void set(int value) {
-		def_->setInPatch(*patch_, value);
+		auto intParam = std::dynamic_pointer_cast<midikraft::SynthIntParameterCapability>(def_);
+		if (intParam) {
+			intParam->setInPatch(*patch_, value);
+		}
+		else {
+			throw std::runtime_error("PyTschirp: Illegal operation, can't set int type");
+		}
 	}
 
-	void set(py::list newlist) {
-		std::vector<int> data;
-		for (size_t i = 0; i < newlist.size(); i++) {
-			if (py::int_(newlist[i]).check()) {
-				data.push_back(py::int_(newlist[i]));
-			}
-			else {
-				throw std::runtime_error("PyTschirp: Only lists of integers can be used as parameters!");
-			}
+	void set(std::vector<int> data) {
+		auto vectorParam = std::dynamic_pointer_cast<midikraft::SynthVectorParameterCapability>(def_);
+		if (vectorParam) {
+			vectorParam->setInPatch(*patch_, data);
 		}
-		def_->setInPatch(*patch_, data);
+		else {
+			throw std::runtime_error("PyTschirp: Illegal operation, can't set vector type");
+		}
 	}
 
 	void setV(bool newValue) {
@@ -56,18 +59,30 @@ public:
 
 	py::object get() const {
 		if (def_->type() == midikraft::SynthParameterDefinition::ParamType::INT_ARRAY) {
-			std::vector<int> value;
-			if (!def_->valueInPatch(*patch_, value)) {
-				throw std::runtime_error("PyTschirp: Internal error getting array from patch data!");
+			auto vectorParam = std::dynamic_pointer_cast<midikraft::SynthVectorParameterCapability>(def_);
+			if (vectorParam) {
+				std::vector<int> value;
+				if (!vectorParam->valueInPatch(*patch_, value)) {
+					throw std::runtime_error("PyTschirp: Internal error getting array from patch data!");
+				}
+				py::list result;
+				for (auto val : value) result.append(val);
+				return result;
 			}
-			py::list result;
-			for (auto val : value) result.append(val);
-			return result;
+			else {
+				throw std::runtime_error("PyTschirp: Invalid type int array but no SynthVectorParameterCapability implemented");
+			}
 		}
 		else {
-			int value;
-			if (def_->valueInPatch(*patch_, value)) {
-				return py::int_(value);
+			auto intParam = std::dynamic_pointer_cast<midikraft::SynthIntParameterCapability>(def_);
+			if (intParam) {
+				int value;
+				if (intParam->valueInPatch(*patch_, value)) {
+					return py::int_(value);
+				}
+			}
+			else {
+				throw std::runtime_error("PyTschirp: Invalid type int but no SynthIntParameterCapability implemented");
 			}
 		}
 		// Invalid
