@@ -9,6 +9,7 @@
 #include "EditBufferCapability.h"
 #include "SimpleDiscoverableDevice.h"
 #include "MidiRequest.h"
+#include "Sysex.h"
 
 template<typename SYNTH, typename TSCHIRP>
 class PyTschirpSynth {
@@ -62,6 +63,17 @@ public:
 			std::cerr << "The " << synth_->getName() << " has no capability to recall the edit buffer, failed." << std::endl;
 			throw std::runtime_error("PyTschirp: No edit buffer capability in device");
 		}
+	}
+
+	std::vector<TSCHIRP> loadSysex(std::string const &filename) {
+		auto midimessages = Sysex::loadSysex(filename);
+		auto patches = synth_->loadSysex(midimessages);
+		
+		std::vector<TSCHIRP> result;
+		for (auto patch : patches) {
+			result.emplace_back(patch, synth_);
+		}
+		return result;
 	}
 
 private:

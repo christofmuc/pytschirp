@@ -17,7 +17,7 @@
 
 namespace py = pybind11;
 
-
+//TODO - should this really be a template class, or should this work with polymorphism?
 template<typename PATCH, typename ATTRIBUTE>
 class PyTschirp {
 public:
@@ -85,6 +85,16 @@ public:
 		}
 	}
 
+	// TODO - this looks like I don't actually need the Tschirp class? Could I move all the code here into the Patch class?
+	// Idea: I could subclass the template PATCH class, then I don't need to reimplement stuff like this?
+	std::string getName() {
+		return patch_->patchName();
+	}
+
+	void setName(std::string const &newName) {
+		patch_->setName(newName);
+	}
+
 	std::string layerName(int layerNo) {
 		auto layeredPatch = std::dynamic_pointer_cast<midikraft::LayeredPatch>(patch_);
 		if (layeredPatch) {
@@ -98,6 +108,10 @@ public:
 			return patch_->patchName();
 		}
 		throw std::runtime_error("PyTschirp: This is not a layered patch, can't retrieve name of layer");
+	}
+
+	std::string toText() {
+		return patch_->patchToTextRaw(false);
 	}
 
 private:
