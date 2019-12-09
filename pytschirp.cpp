@@ -44,7 +44,8 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def("__setattr__", py::overload_cast<std::string const &, std::vector<int> const &>(&PyTschirp_Rev2::set_attr))
 		.def_property("name", &PyTschirp_Rev2::getName, &PyTschirp_Rev2::setName)
 		.def("layerName", &PyTschirp_Rev2::layerName)
-		.def("toText", &PyTschirp_Rev2::toText);
+		.def("toText", &PyTschirp_Rev2::toText)
+		.def("parameterNames", &PyTschirp_Rev2::parameterNames);
 
 	//TODO
 	// set name of patch/layer

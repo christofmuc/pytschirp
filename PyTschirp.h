@@ -117,6 +117,14 @@ public:
 		return patch_->patchToTextRaw(false);
 	}
 
+	std::vector<std::string> parameterNames() {
+		std::vector<std::string> result;
+		for (auto p : patch_->allParameterDefinitions()) {
+			result.push_back(p->name());
+		}
+		return result;
+	}
+
 private:
 	std::string underscoreToSpace(std::string const &input) {
 		auto copy = input;
