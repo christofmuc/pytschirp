@@ -42,6 +42,8 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def("__getattr__", &PyTschirp_Rev2::get_attr)
 		.def("__setattr__", py::overload_cast<std::string const &, int>(&PyTschirp_Rev2::set_attr))
 		.def("__setattr__", py::overload_cast<std::string const &, std::vector<int> const &>(&PyTschirp_Rev2::set_attr))
+		.def("__setitem__", py::overload_cast<std::string const &, int>(&PyTschirp_Rev2::set_attr))
+		.def("__setitem__", py::overload_cast<std::string const &, std::vector<int> const &>(&PyTschirp_Rev2::set_attr))
 		.def_property("name", &PyTschirp_Rev2::getName, &PyTschirp_Rev2::setName)
 		.def("layerName", &PyTschirp_Rev2::layerName)
 		.def("toText", &PyTschirp_Rev2::toText)
