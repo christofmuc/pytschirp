@@ -52,7 +52,7 @@ public:
 	void set_attr(std::string const &name, int value) {
 		try {
 			auto attr = ATTRIBUTE(patch_, name);
-			attr.setV(value);
+			attr.set(value);
 			if (!synth_.expired() && synth_.lock()->channel().isValid()) {
 				auto liveEditing = std::dynamic_pointer_cast<midikraft::SynthParameterLiveEditCapability>(attr.def());
 				if (liveEditing) {
@@ -64,7 +64,7 @@ public:
 		}
 		catch (std::runtime_error &) {
 			auto attr = ATTRIBUTE(patch_, underscoreToSpace(name));
-			attr.setV(value);
+			attr.set(value);
 		}
 	}
 

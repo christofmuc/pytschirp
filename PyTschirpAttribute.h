@@ -42,21 +42,6 @@ public:
 		}
 	}
 
-	void setV(bool newValue) {
-		def_->setInPatch(*patch_, newValue ? 1 : 0);
-	}
-
-	void setV(int newValue) {
-		
-	}
-
-	void setV(int newValue, int relIndex) {
-		if (def_->sysexIndex() + relIndex > def_->endSysexIndex()) {
-			throw std::runtime_error("PyTschirp: Index out of range");
-		}
-		patch_->setAt(def_->sysexIndex() + relIndex, newValue);
-	}
-
 	py::object get() const {
 		if (def_->type() == midikraft::SynthParameterDefinition::ParamType::INT_ARRAY) {
 			auto vectorParam = std::dynamic_pointer_cast<midikraft::SynthVectorParameterCapability>(def_);
