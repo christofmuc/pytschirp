@@ -84,6 +84,11 @@ PYBIND11_MODULE(pytschirp, m) {
 	// For use in PyTschirp, we need to lazily create the MidiController Singleton so it is in the right heap
 	if (!midikraft::MidiController::instance()) {
 		new midikraft::MidiController();
+
+		// Also, by default install a MIDI logger on stderr so we can see what is being sent and received
+		midikraft::MidiController::instance()->setMidiLogFunction([](MidiMessage const &message, String const &source, bool isOut) {
+			std::cerr << (isOut ? "O: " : "I: ") << message.getDescription() << std::endl;
+		});
 	}
 	// And JUCE itself might not be fired up, so let's do that!
 	juce::MessageManager::getInstance();
