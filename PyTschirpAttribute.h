@@ -90,7 +90,7 @@ public:
 	}
 
 	std::string asText() const {
-		return "not implemented"; // def_->valueAsText(get());
+		return def_->valueInPatchToText(*patch_);
 	}
 
 	// Bindings not for python
