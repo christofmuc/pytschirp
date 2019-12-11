@@ -75,7 +75,12 @@ public:
 	}
 
 	std::string asText() const {
-		return def_->valueInPatchToText(*patch_);
+		if (def_) {
+			return def_->valueInPatchToText(*patch_);
+		}
+		else {
+			return "unknown attribute";
+		}
 	}
 
 	// Bindings not for python
