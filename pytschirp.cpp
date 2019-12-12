@@ -52,7 +52,6 @@ PYBIND11_MODULE(pytschirp, m) {
 
 	//TODO
 	// set name of patch/layer
-	// get list of attributes
 				
 	py::class_<PyAttribute_Rev2> rev2_attribute(m, "Rev2Attribute");
 	rev2_attribute
@@ -64,8 +63,6 @@ PYBIND11_MODULE(pytschirp, m) {
 		;
 	py::class_<PyTschirpInvalidAttribute> pyTschirpInvalidAttribute(m, "InvalidAttribute");
 
-	// Ints as text
-
 	py::class_<PyTschirpSynth_Rev2> pyTschirpSynth(m, "Rev2");
 	pyTschirpSynth
 		.def(py::init<>())
@@ -73,12 +70,13 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def("detected", &PyTschirpSynth_Rev2::detected)
 		.def("location", &PyTschirpSynth_Rev2::location)
 		.def("editBuffer", &PyTschirpSynth_Rev2::editBuffer)
-		.def("loadSysex", &PyTschirpSynth_Rev2::loadSysex);
+		.def("loadSysex", &PyTschirpSynth_Rev2::loadSysex)
+		.def("saveSysex", &PyTschirpSynth_Rev2::saveSysex)
+		.def("saveEditBuffer", &PyTschirpSynth_Rev2::saveSysex);
 
 	// TODO
 	// sendPatchToEditBuffer
 	// sendPatchToStoragePlace
-	// savePatchAsSysex
 	// get specific patch at specific location from synth
 
 	// Fire up Singletons used by the frameworks we need

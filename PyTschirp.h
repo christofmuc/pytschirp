@@ -125,6 +125,12 @@ public:
 		return result;
 	}
 
+
+	//! Use this at your own risk
+	std::shared_ptr<PATCH> patchPtr() {
+		return patch_;
+	}
+
 private:
 	std::string underscoreToSpace(std::string const &input) {
 		auto copy = input;

@@ -43,7 +43,9 @@ public:
 	}
 
 	py::object get() const {
-		if (def_->type() == midikraft::SynthParameterDefinition::ParamType::INT_ARRAY) {
+		if ((def_->type() == midikraft::SynthParameterDefinition::ParamType::INT_ARRAY) 
+			|| (def_->type() == midikraft::SynthParameterDefinition::ParamType::LOOKUP_ARRAY))
+		{
 			auto vectorParam = std::dynamic_pointer_cast<midikraft::SynthVectorParameterCapability>(def_);
 			if (vectorParam) {
 				std::vector<int> value;
@@ -76,7 +78,7 @@ public:
 
 	std::string asText() const {
 		if (def_) {
-			return def_->valueInPatchToText(*patch_);
+		return def_->valueInPatchToText(*patch_);
 		}
 		else {
 			return "unknown attribute";

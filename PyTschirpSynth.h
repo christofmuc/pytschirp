@@ -76,6 +76,32 @@ public:
 		return result;
 	}
 
+	void saveSysex(std::string const &filename, std::vector <TSCHIRP> &patches) {
+		auto pdc = std::dynamic_pointer_cast<midikraft::ProgramDumpCabability>(synth_);
+		if (pdc) {
+			std::vector<MidiMessage> result;
+			for (auto tschirp : patches) {
+				auto m = pdc->patchToProgramDumpSysex(*tschirp.patchPtr());
+				std::copy(m.cbegin(), m.cend(), std::back_inserter(result));
+			}
+			Sysex::saveSysex(filename, result);
+		}
+		else {
+			throw std::runtime_error("PyTschirp: Synth has not implemented the ProgramDumpCapability, consider saving the patches one by one with the saveEditBuffer() function");
+		}
+	}
+
+	void saveEditBuffer(std::string const &filename, TSCHIRP &patch) {
+		auto ebc = std::dynamic_pointer_cast<midikraft::EditBufferCapability>(synth_);
+		if (ebc) {
+			auto midiMessages = ebc->patchToSysex(*patch.patchPtr());
+			Sysex::saveSysex(filename, midiMessages);
+		}
+		else {
+			throw std::runtime_error("PyTschirp: Synth has not implemented the EditBufferCapability, cannot save the patch as edit buffer sysex");
+		}
+	}
+
 private:
 	std::shared_ptr<SYNTH> synth_;
 };
