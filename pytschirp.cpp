@@ -88,7 +88,7 @@ PYBIND11_MODULE(pytschirp, m) {
 
 		// Also, by default install a MIDI logger on stderr so we can see what is being sent and received
 		midikraft::MidiController::instance()->setMidiLogFunction([](MidiMessage const &message, String const &source, bool isOut) {
-			std::cerr << (isOut ? "O: " : "I: ") << message.getDescription() << std::endl;
+			py::print(isOut ? "O: " : "I: ", message.getDescription().toStdString());
 		});
 	}
 	// And JUCE itself might not be fired up, so let's do that!
