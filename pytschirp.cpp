@@ -33,8 +33,16 @@ typedef PyTschirp<midikraft::Rev2Patch, PyAttribute_Rev2> PyTschirp_Rev2;
 
 typedef PyTschirpSynth<midikraft::Rev2, PyTschirp_Rev2> PyTschirpSynth_Rev2;
 
+midikraft::MidiController *correctMidiController() {
+	return  midikraft::MidiController::instance();
+}
+
 PYBIND11_MODULE(pytschirp, m) {
 	m.doc() = "Provide PyTschirp bindings for the Sequential Prophet Rev2";
+
+	py::class_<midikraft::MidiController> midiController(m, "MidiController");
+	midiController.def(py::init<>());
+	m.def("midiControllerInstance", &correctMidiController, py::return_value_policy::reference);
 
 	py::class_<PyTschirp_Rev2> rev2_tschirp(m, "Rev2Patch");
 	rev2_tschirp.def(py::init<>())
@@ -84,8 +92,6 @@ PYBIND11_MODULE(pytschirp, m) {
 
 	// For use in PyTschirp, we need to lazily create the MidiController Singleton so it is in the right heap
 	if (!midikraft::MidiController::instance()) {
-		new midikraft::MidiController();
-
 		// Also, by default install a MIDI logger on stderr so we can see what is being sent and received
 		midikraft::MidiController::instance()->setMidiLogFunction([](MidiMessage const &message, String const &source, bool isOut) {
 			py::print(isOut ? "O: " : "I: ", message.getDescription().toStdString());
