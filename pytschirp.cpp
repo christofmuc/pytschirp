@@ -80,7 +80,7 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def("editBuffer", &PyTschirpSynth_Rev2::editBuffer)
 		.def("loadSysex", &PyTschirpSynth_Rev2::loadSysex)
 		.def("saveSysex", &PyTschirpSynth_Rev2::saveSysex)
-		.def("saveEditBuffer", &PyTschirpSynth_Rev2::saveSysex);
+		.def("saveEditBuffer", &PyTschirpSynth_Rev2::saveEditBuffer);
 
 	// TODO
 	// sendPatchToEditBuffer
