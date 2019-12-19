@@ -19,7 +19,7 @@ namespace py = pybind11;
 
 //TODO - should this really be a template class, or should this work with polymorphism?
 template<typename PATCH, typename ATTRIBUTE>
-class PyTschirp {
+class PyTschirp {	
 public:
 	PyTschirp() {
 		patch_ = std::make_shared<PATCH>();
@@ -40,59 +40,63 @@ public:
 	}
 
 	ATTRIBUTE get_attr(std::string const &attrName) {
-			return ATTRIBUTE(patch_, attrName);
-		}
+		return ATTRIBUTE(patch_, attrName);
+	}
 
 	void set_attr(std::string const &name, int value) {
-			auto attr = ATTRIBUTE(patch_, name);
-			attr.set(value);
-			if (!synth_.expired() && synth_.lock()->channel().isValid()) {
-				auto liveEditing = std::dynamic_pointer_cast<midikraft::SynthParameterLiveEditCapability>(attr.def());
-				if (liveEditing) {
-					// The synth is hot... we don't know if this patch is currently selected, but let's send the nrpn or other value changing message anyway!
-					auto messages = liveEditing->setValueMessages(*patch_, synth_.lock().get());
-					midikraft::MidiController::instance()->getMidiOutput(synth_.lock()->midiOutput())->sendBlockOfMessagesNow(messages);
-				}
+		auto attr = ATTRIBUTE(patch_, name);
+		attr.set(value);
+		if (!synth_.expired() && synth_.lock()->channel().isValid()) {
+			auto liveEditing = std::dynamic_pointer_cast<midikraft::SynthParameterLiveEditCapability>(attr.def());
+			if (liveEditing) {
+				// The synth is hot... we don't know if this patch is currently selected, but let's send the nrpn or other value changing message anyway!
+				auto messages = liveEditing->setValueMessages(*patch_, synth_.lock().get());
+				midikraft::MidiController::instance()->getMidiOutput(synth_.lock()->midiOutput())->sendBlockOfMessagesNow(messages);
 			}
 		}
+	}
 
 	void set_attr(std::string const &name, std::vector<int> const &value) {
-			auto attr = ATTRIBUTE(patch_, name);
-			attr.set(value);
-			
-			if (!synth_.expired() && synth_.lock()->channel().isValid()) {
-				auto liveEditing = std::dynamic_pointer_cast<midikraft::SynthParameterLiveEditCapability>(attr.def());
-				if (liveEditing) {
-					// The synth is hot... we don't know if this patch is currently selected, but let's send the nrpn or other value changing message anyway!
-					auto messages = liveEditing->setValueMessages(*patch_, synth_.lock().get());
-					midikraft::MidiController::instance()->getMidiOutput(synth_.lock()->midiOutput())->sendBlockOfMessagesNow(messages);
-				}
+		auto attr = ATTRIBUTE(patch_, name);
+		attr.set(value);
+
+		if (!synth_.expired() && synth_.lock()->channel().isValid()) {
+			auto liveEditing = std::dynamic_pointer_cast<midikraft::SynthParameterLiveEditCapability>(attr.def());
+			if (liveEditing) {
+				// The synth is hot... we don't know if this patch is currently selected, but let's send the nrpn or other value changing message anyway!
+				auto messages = liveEditing->setValueMessages(*patch_, synth_.lock().get());
+				midikraft::MidiController::instance()->getMidiOutput(synth_.lock()->midiOutput())->sendBlockOfMessagesNow(messages);
 			}
 		}
+	}
 
-	// TODO - this looks like I don't actually need the Tschirp class? Could I move all the code here into the Patch class?
-	// Idea: I could subclass the template PATCH class, then I don't need to reimplement stuff like this?
 	std::string getName() {
-		return patch_->patchName();
+		if (layerNo_ == -1) {
+			return patch_->patchName();
+		}
+		else {
+			auto layeredPatch = std::dynamic_pointer_cast<midikraft::LayeredPatch>(patch_);
+			if (layeredPatch) {
+				return layeredPatch->layerName(layerNo_);
+			}
+			else {
+				throw std::runtime_error("PyTschirp: Program error: This is not a layered patch, but should be.");
+			}
+		}
 	}
 
 	void setName(std::string const &newName) {
 		patch_->setName(newName);
 	}
 
-	std::string layerName(int layerNo) {
+	PyTschirp layer(int layerNo) {
 		auto layeredPatch = std::dynamic_pointer_cast<midikraft::LayeredPatch>(patch_);
-		if (layeredPatch) {
-			if (layerNo >= 0 && layerNo < layeredPatch->numberOfLayers()) {
-				return layeredPatch->layerName(layerNo);
-			}
-			throw std::runtime_error("PyTschirp: Invalid layer number given to layerName()");
+		if (!layeredPatch) {
+			throw std::runtime_error("PyTschirp: This is not a layered patch, can't retrieve layer");
 		}
-		if (layerNo == 0) {
-			// Not a layered patch, but hey, layer 0 is good
-			return patch_->patchName();
-		}
-		throw std::runtime_error("PyTschirp: This is not a layered patch, can't retrieve name of layer");
+
+		// Create a new Tschirp that is the same as this one, but stores a layer number and thus will reroute all calls to the layer selected
+		return PyTschirp(patch_, synth_, layerNo);
 	}
 
 	std::string toText() {
@@ -114,6 +118,18 @@ public:
 	}
 
 private:
+	// Private constructor to create a layer accessing Tschirp
+	PyTschirp(std::shared_ptr<midikraft::Patch> p, std::weak_ptr<midikraft::Synth> synth, int layerNo) : PyTschirp(p, synth) {
+		layerNo_ = layerNo;
+
+		auto layeredPatch = std::dynamic_pointer_cast<midikraft::LayeredPatch>(patch_);
+		if (layeredPatch) {
+			if (!(layerNo >= 0 && layerNo < layeredPatch->numberOfLayers())) {
+				throw std::runtime_error("PyTschirp: Invalid layer number given to layerName()");
+			}
+		}
+	}
+
 	std::string underscoreToSpace(std::string const &input) {
 		auto copy = input;
 		std::replace(copy.begin(), copy.end(), '_', ' ');
@@ -122,5 +138,6 @@ private:
 
 	std::shared_ptr<PATCH> patch_;
 	std::weak_ptr<midikraft::Synth> synth_;
+	int layerNo_ = -1; // -1 means no layer is selected, access the whole patch. Else, this is the layer number this Tschirp represents
 };
 
