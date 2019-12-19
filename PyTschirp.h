@@ -40,17 +40,10 @@ public:
 	}
 
 	ATTRIBUTE get_attr(std::string const &attrName) {
-		try {
 			return ATTRIBUTE(patch_, attrName);
 		}
-		catch (std::runtime_error &) {
-			// That doesn't seem to exist... try with spaces instead of underscores in the name
-			return ATTRIBUTE(patch_, underscoreToSpace(attrName));
-		}
-	}
 
 	void set_attr(std::string const &name, int value) {
-		try {
 			auto attr = ATTRIBUTE(patch_, name);
 			attr.set(value);
 			if (!synth_.expired() && synth_.lock()->channel().isValid()) {
@@ -62,14 +55,8 @@ public:
 				}
 			}
 		}
-		catch (std::runtime_error &) {
-			auto attr = ATTRIBUTE(patch_, underscoreToSpace(name));
-			attr.set(value);
-		}
-	}
 
 	void set_attr(std::string const &name, std::vector<int> const &value) {
-		try {
 			auto attr = ATTRIBUTE(patch_, name);
 			attr.set(value);
 			
@@ -82,11 +69,6 @@ public:
 				}
 			}
 		}
-		catch (std::runtime_error &) {
-			auto attr = ATTRIBUTE(patch_, underscoreToSpace(name));
-			//attr.setV(value);
-		}
-	}
 
 	// TODO - this looks like I don't actually need the Tschirp class? Could I move all the code here into the Patch class?
 	// Idea: I could subclass the template PATCH class, then I don't need to reimplement stuff like this?
