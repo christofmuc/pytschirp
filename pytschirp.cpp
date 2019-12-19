@@ -27,7 +27,7 @@ public:
 };
 
 // Configure the template with the various classes for the Rev2
-typedef PyTschirpAttribute<midikraft::Rev2Patch, midikraft::Rev2ParamDefinition, std::string> PyAttribute_Rev2;
+typedef PyTschirpAttribute<midikraft::Rev2Patch, midikraft::Rev2ParamDefinition> PyAttribute_Rev2;
 
 typedef PyTschirp<midikraft::Rev2Patch, PyAttribute_Rev2> PyTschirp_Rev2;
 

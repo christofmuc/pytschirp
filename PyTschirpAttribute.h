@@ -16,10 +16,10 @@ public:
 	}
 };
 
-template<typename PATCH, typename SYNTHPARAM, typename PARAM_ID>
+template<typename PATCH, typename SYNTHPARAM>
 class PyTschirpAttribute {
 public:
-	PyTschirpAttribute(std::shared_ptr<PATCH> patch, PARAM_ID const &param) : patch_(patch), def_(PATCH::find(param)) {
+	PyTschirpAttribute(std::shared_ptr<PATCH> patch, std::string const &param) : patch_(patch), def_(PATCH::find(param)) {
 	}
 
 	void set(int value) {
