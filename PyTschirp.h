@@ -29,7 +29,7 @@ public:
 		// Downcast possible?
 		auto correctPatch = std::dynamic_pointer_cast<PATCH>(p);
 		if (!correctPatch) {
-			throw std::runtime_error("PyTschirp: Can't downcast, wrong patch type! Program error");
+			throw std::runtime_error("PyTschirp: Program error: Can't downcast, wrong patch type!");
 		}
 		patch_ = correctPatch;
 		synth_ = synth;
