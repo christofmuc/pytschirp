@@ -55,7 +55,6 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def("__getitem__", &PyTschirp_Rev2::get_attr)
 		.def_property("name", &PyTschirp_Rev2::getName, &PyTschirp_Rev2::setName)
 		.def("layer", &PyTschirp_Rev2::layer)
-		.def("toText", &PyTschirp_Rev2::toText)
 		.def("parameterNames", &PyTschirp_Rev2::parameterNames);
 
 	//TODO
