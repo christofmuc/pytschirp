@@ -69,7 +69,6 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def("asText", &PyAttribute_Rev2::asText)
 		.def("__repr__", &PyAttribute_Rev2::asText)
 		;
-	py::class_<PyTschirpInvalidAttribute> pyTschirpInvalidAttribute(m, "InvalidAttribute");
 
 	py::class_<PyTschirpSynth_Rev2> pyTschirpSynth(m, "Rev2");
 	pyTschirpSynth

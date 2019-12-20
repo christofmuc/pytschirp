@@ -8,14 +8,6 @@
 
 #include "JuceHeader.h"
 
-class PyTschirpInvalidAttribute {
-public:
-	void set(int newValue) {
-		ignoreUnused(newValue);
-		throw new std::runtime_error("PyTschirp: Can't set value of invalid attribute");
-	}
-};
-
 template<typename PATCH, typename SYNTHPARAM>
 class PyTschirpAttribute {
 public:
