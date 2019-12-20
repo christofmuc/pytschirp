@@ -35,12 +35,13 @@ public:
 		synth_ = synth;
 	}
 
-	ATTRIBUTE attr(std::string const &param) {
-		return ATTRIBUTE(patch_, param);
-	}
-
 	ATTRIBUTE get_attr(std::string const &attrName) {
-		return ATTRIBUTE(patch_, attrName);
+		if (layerNo_ == -1) {
+			return ATTRIBUTE(patch_, attrName);
+		}
+		else {
+			return ATTRIBUTE(patch_, attrName, layerNo_);
+		}
 	}
 
 	void set_attr(std::string const &name, int value) {

@@ -14,6 +14,15 @@ public:
 	PyTschirpAttribute(std::shared_ptr<PATCH> patch, std::string const &param) : patch_(patch), def_(PATCH::find(param)) {
 	}
 
+	PyTschirpAttribute(std::shared_ptr<PATCH> patch, std::string const &param, int targetLayerNo) : patch_(patch), def_(PATCH::find(param)) {
+		auto layerAccess = std::dynamic_pointer_cast<midikraft::SynthMultiLayerParameterCapability>(def_);
+		if (!layerAccess) {
+			throw std::runtime_error("PyTschirp: Program Error: Parameter set does not support multi layers");
+		}
+		// This parameter definition targets a specific layer. This is used e.g. to access either Layer A or Layer B of a Prophet Rev2
+		layerAccess->setTargetLayer(targetLayerNo);
+	}
+
 	void set(int value) {
 		auto intParam = std::dynamic_pointer_cast<midikraft::SynthIntParameterCapability>(def_);
 		if (intParam) {
@@ -70,7 +79,7 @@ public:
 
 	std::string asText() const {
 		if (def_) {
-		return def_->valueInPatchToText(*patch_);
+			return def_->valueInPatchToText(*patch_);
 		}
 		else {
 			return "unknown attribute";

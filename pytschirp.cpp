@@ -46,7 +46,7 @@ PYBIND11_MODULE(pytschirp, m) {
 
 	py::class_<PyTschirp_Rev2> rev2_tschirp(m, "Rev2Patch");
 	rev2_tschirp.def(py::init<>())
-		.def("attr", &PyTschirp_Rev2::attr)
+		.def("attr", &PyTschirp_Rev2::get_attr)
 		.def("__getattr__", &PyTschirp_Rev2::get_attr)
 		.def("__setattr__", py::overload_cast<std::string const &, int>(&PyTschirp_Rev2::set_attr))
 		.def("__setattr__", py::overload_cast<std::string const &, std::vector<int> const &>(&PyTschirp_Rev2::set_attr))
