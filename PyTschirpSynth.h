@@ -22,7 +22,7 @@ public:
 		std::vector<std::shared_ptr<midikraft::SimpleDiscoverableDevice>> list;
 		list.push_back(synth_);
 		midikraft::AutoDetection autodetection;
-		autodetection.autoconfigure(list);
+		autodetection.autoconfigure(list, nullptr);
 	}
 
 	bool detected() {
