@@ -33,4 +33,20 @@ set_target_properties(pytschirp PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                          SUFFIX "${PYTHON_MODULE_EXTENSION}")
 
 add_executable(testExe test.cpp)
-target_link_libraries(testExe PRIVATE juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES})
+
+IF(WIN32)
+	target_link_libraries(testExe PRIVATE juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES})
+ELSEIF(UNIX)
+	target_link_libraries(testExe PRIVATE 		
+		PkgConfig::WEBKIT 
+		PkgConfig::GTK 
+		PkgConfig::GLEW 
+		Xext 
+		X11 
+		pthread 		
+		freetype 
+		curl 
+		asound alsa
+		juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES}
+		)
+ENDIF()
