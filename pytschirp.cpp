@@ -4,14 +4,14 @@
    Dual licensed: Distributed under Affero GPL license by default, an MIT license is available for purchase
 */
 
-#include "PyTschirp.h"
-#include "PyTschirpAttribute.h"
-#include "PyTschirpSynth.h"
-
 #include "Logger.h"
 
 #include "Rev2.h"
 #include "Rev2Patch.h"
+
+#include "PyTschirp.h"
+#include "PyTschirpAttribute.h"
+#include "PyTschirpSynth.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h> // For vector to list
