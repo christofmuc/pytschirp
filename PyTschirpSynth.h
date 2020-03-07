@@ -10,6 +10,7 @@
 #include "SimpleDiscoverableDevice.h"
 #include "MidiRequest.h"
 #include "Sysex.h"
+#include "Librarian.h"
 
 template<typename SYNTH, typename TSCHIRP>
 class PyTschirpSynth {
@@ -100,6 +101,16 @@ public:
 		else {
 			throw std::runtime_error("PyTschirp: Synth has not implemented the EditBufferCapability, cannot save the patch as edit buffer sysex");
 		}
+	}
+
+	void getGlobalSettings() {
+		std::vector<midikraft::SynthHolder> synths({ midikraft::SynthHolder(synth_) });
+		midikraft::Librarian librarian(synths);
+		bool done = false;
+		librarian.startDownloadingSequencerData(midikraft::MidiController::instance()->getMidiOutput(synth_->midiOutput()), synth_.get(), 0, nullptr, [this, &done]() {
+			done = true;
+		});
+		midikraft::MidiRequest::blockUntilTrue([&done]() { return done;  }, 2000);
 	}
 
 private:

@@ -17,6 +17,8 @@ IF(NOT DEFINED JUCE_LIBRARIES)
 			juce_audio_basics
 			juce_audio_devices
 			juce_data_structures
+			juce_gui_basics # Colour
+			juce_cryptography # MD5
 	)
 ENDIF()
 
@@ -28,7 +30,7 @@ set(SOURCES
 )
 
 pybind11_add_module(pytschirp ${SOURCES})
-target_link_libraries(pytschirp PRIVATE juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES})
+target_link_libraries(pytschirp PRIVATE juce-utils midikraft-base midikraft-librarian midikraft-sequential-rev2 ${JUCE_LIBRARIES})
 set_target_properties(pytschirp PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                          SUFFIX "${PYTHON_MODULE_EXTENSION}")
 
