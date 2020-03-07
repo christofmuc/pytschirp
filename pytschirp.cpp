@@ -5,6 +5,7 @@
 */
 
 #include "Logger.h"
+#include "Settings.h"
 
 #include "Rev2.h"
 #include "Rev2Patch.h"
@@ -36,6 +37,20 @@ typedef PyTschirpSynth<midikraft::Rev2, PyTschirp_Rev2> PyTschirpSynth_Rev2;
 midikraft::MidiController *correctMidiController() {
 	return  midikraft::MidiController::instance();
 }
+
+class MessageThread : public Thread {
+public:
+	MessageThread() : Thread("pytschirp MessageManager Thread") {
+	}
+
+	void run() override {
+		MessageManager::getInstance()->setCurrentThreadAsMessageThread();
+		MessageManager::getInstance()->runDispatchLoop();
+	}
+};
+
+MessageThread globalMessageThread;
+std::unique_ptr<PythonLogger> globalPythonLogger;
 
 PYBIND11_MODULE(pytschirp, m) {
 	m.doc() = "Provide PyTschirp bindings for the Sequential Prophet Rev2";
@@ -100,7 +115,7 @@ PYBIND11_MODULE(pytschirp, m) {
 	// get specific patch at specific location from synth
 
 	// Fire up Singletons used by the frameworks we need
-	new PythonLogger();
+	globalPythonLogger = std::make_unique<PythonLogger>();
 
 	// For use in PyTschirp, we need to lazily create the MidiController Singleton so it is in the right heap
 	if (!midikraft::MidiController::instance()) {
@@ -111,6 +126,23 @@ PYBIND11_MODULE(pytschirp, m) {
 	}
 	// And JUCE itself might not be fired up, so let's do that!
 	juce::MessageManager::getInstance();
+
+	// Install cleanup procedure - we don't know when this module is actually removed, so we have to use python atexit
+	auto atexit = py::module::import("atexit");
+	atexit.attr("register")(py::cpp_function([]() {
+		// perform cleanup here -- this function is called with the GIL held
+		MessageManager::getInstance()->stopDispatchLoop();
+		globalMessageThread.signalThreadShouldExit();
+		globalMessageThread.stopThread(1000);
+
+		// Now, tear down Singletons we have created. 
+		Settings::shutdown();
+		midikraft::MidiController::shutdown();
+		SimpleLogger::shutdown();
+	}));
+
+	// Fire up global message thread that is used when JUCE is run only within this python module.
+	globalMessageThread.startThread();
 }
 
 
