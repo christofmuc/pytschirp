@@ -38,15 +38,15 @@ IF(WIN32)
 	target_link_libraries(testExe PRIVATE juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES})
 ELSEIF(UNIX)
 	target_link_libraries(testExe PRIVATE 		
-		PkgConfig::WEBKIT 
-		PkgConfig::GTK 
-		PkgConfig::GLEW 
-		Xext 
-		X11 
-		pthread 		
-		freetype 
+		#PkgConfig::WEBKIT 
+		#PkgConfig::GTK 
+		#PkgConfig::GLEW 
+		#Xext 
+		#X11 
+		pthread dl	
+		#freetype 
 		curl 
-		asound alsa
+		asound 
 		juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES}
 		)
 ENDIF()
