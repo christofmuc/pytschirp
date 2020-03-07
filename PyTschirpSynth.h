@@ -12,6 +12,8 @@
 #include "Sysex.h"
 #include "Librarian.h"
 
+#include "PyPropertySet.h"
+
 template<typename SYNTH, typename TSCHIRP>
 class PyTschirpSynth {
 public:
@@ -103,7 +105,7 @@ public:
 		}
 	}
 
-	void getGlobalSettings() {
+	TPyPropertySet getGlobalSettings() {
 		std::vector<midikraft::SynthHolder> synths({ midikraft::SynthHolder(synth_) });
 		midikraft::Librarian librarian(synths);
 		bool done = false;
@@ -111,6 +113,7 @@ public:
 			done = true;
 		});
 		midikraft::MidiRequest::blockUntilTrue([&done]() { return done;  }, 2000);
+		return buildFromVector(synth_->getGlobalSettings());
 	}
 
 private:

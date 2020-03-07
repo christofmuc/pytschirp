@@ -25,6 +25,7 @@ ENDIF()
 set(SOURCES
 	PyTschirp.h
 	PyTschirpAttribute.h
+	PyPropertySet.h
 	PyTschirpSynth.h
 	pytschirp.cpp
 )

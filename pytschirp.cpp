@@ -12,9 +12,10 @@
 #include "PyTschirp.h"
 #include "PyTschirpAttribute.h"
 #include "PyTschirpSynth.h"
+#include "PyPropertySet.h"
 
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h> // For vector to list
+#include <pybind11/stl_bind.h> // To expose the map as a dict
 
 namespace py = pybind11;
 
@@ -56,6 +57,14 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def_property("name", &PyTschirp_Rev2::getName, &PyTschirp_Rev2::setName)
 		.def("layer", &PyTschirp_Rev2::layer)
 		.def("parameterNames", &PyTschirp_Rev2::parameterNames);
+
+	py::class_<PyTypedNamedValue> typedNamedValue(m, "PyTypedNamedValue");
+	typedNamedValue
+		.def(py::init<>())
+		.def("set", &PyTypedNamedValue::setValue)
+		.def("get", &PyTypedNamedValue::getValue);
+	py::bind_map<TPyPropertySet>(m, "PyPropertySet");
+
 
 	//TODO
 	// set name of patch/layer
