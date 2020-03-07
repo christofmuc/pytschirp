@@ -40,9 +40,16 @@ void PyTypedNamedValue::setValue(py::handle const &o)
 	case ValueType::String:
 		value_->value = String(o.cast<std::string>());
 		break;
-	case ValueType::Lookup:
-		value_->value = o.operator bool();
-		break;
+	case ValueType::Lookup: {
+		std::string valueToSet = o.cast<std::string>();
+		for (auto const &possibleValue : value_->lookup) {
+			if (possibleValue.second == valueToSet) {
+				value_->value = possibleValue.first;
+				return;
+			}
+		}
+		throw new std::domain_error("pytschirp: Value " + valueToSet + " is not a valid value for item " + value_->name.toStdString());
+	}
 	default:
 		throw new std::runtime_error("pytschirp: Invalid property type given to pyobject cast");
 	}
