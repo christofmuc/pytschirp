@@ -105,7 +105,7 @@ public:
 		}
 	}
 
-	TPyPropertySet getGlobalSettings() {
+	PyPropertySet getGlobalSettings() {
 		std::vector<midikraft::SynthHolder> synths({ midikraft::SynthHolder(synth_) });
 		midikraft::Librarian librarian(synths);
 		bool done = false;
@@ -113,7 +113,7 @@ public:
 			done = true;
 		});
 		midikraft::MidiRequest::blockUntilTrue([&done]() { return done;  }, 2000);
-		return buildFromVector(synth_->getGlobalSettings());
+		return PyPropertySet(synth_->getGlobalSettings());
 	}
 
 private:

@@ -17,57 +17,36 @@ namespace py = pybind11;
 
 class PyTypedNamedValue {
 public:
-	PyTypedNamedValue() {};
-
+	PyTypedNamedValue() = default;
 	PyTypedNamedValue(std::shared_ptr<TypedNamedValue> value) : value_(value) {}
 
-	py::object getValue() const {
-		switch (value_->valueType) {
-		case ValueType::Bool:
-			return py::cast(bool(var(value_->value)));
-		case ValueType::Integer:
-			return py::cast(int(var(value_->value)));
-		case ValueType::String:
-			return py::cast(var(value_->value).operator juce::String().toStdString());
-		case ValueType::Lookup:
-			return py::cast(value_->lookup[(var) value_->value]);
-		default:
-			throw new std::runtime_error("pytschirp: Invalid property type given to pyobject cast");
-		}
-	}
-
-	void setValue(py::handle const &o) {
-		switch (value_->valueType)
-		{
-		case ValueType::Bool:
-			value_->value = o.cast<bool>();
-			break;
-		case ValueType::Integer:
-			value_->value = o.cast<int>();
-			break;
-		case ValueType::String:
-			value_->value = String(o.cast<std::string>());
-			break;
-		case ValueType::Lookup:
-			value_->value = o.operator bool();
-			break;
-		default:
-			throw new std::runtime_error("pytschirp: Invalid property type given to pyobject cast");
-		}
-	}
+	py::object repr() const;
+	py::object getValue() const;
+	void setValue(py::handle const &o);
 
 private:
 	std::shared_ptr<TypedNamedValue> value_;
 };
 
-typedef std::map<std::string, PyTypedNamedValue> TPyPropertySet;
 
-TPyPropertySet buildFromVector(std::vector<std::shared_ptr<TypedNamedValue>> values) {
-	TPyPropertySet result;
-	for (auto const &v : values) {
-		result[v->name.toStdString()] = PyTypedNamedValue(v);
-	}
-	return result;
-}
+class PyPropertySet {
+public:
+	typedef std::map<std::string, PyTypedNamedValue> TPyPropertySet;
+	using key_type = TPyPropertySet::key_type;
+
+	PyPropertySet() = default;
+
+	static TPyPropertySet buildFromVector(std::vector<std::shared_ptr<TypedNamedValue>> values);
+
+	PyPropertySet(std::vector<std::shared_ptr<TypedNamedValue>> const &properties);
+
+	py::iterator iter();
+	PyTypedNamedValue getItem(PyPropertySet::key_type const &key);
+	void setItem(PyPropertySet::key_type const &key, py::object const &o);
+
+//private:
+	TPyPropertySet propertySet_;
+};
+
 
 

@@ -15,7 +15,6 @@
 #include "PyPropertySet.h"
 
 #include <pybind11/pybind11.h>
-#include <pybind11/stl_bind.h> // To expose the map as a dict
 
 namespace py = pybind11;
 
@@ -60,11 +59,16 @@ PYBIND11_MODULE(pytschirp, m) {
 
 	py::class_<PyTypedNamedValue> typedNamedValue(m, "PyTypedNamedValue");
 	typedNamedValue
-		.def(py::init<>())
+		.def("__repr__", &PyTypedNamedValue::repr)
 		.def("set", &PyTypedNamedValue::setValue)
 		.def("get", &PyTypedNamedValue::getValue);
-	py::bind_map<TPyPropertySet>(m, "PyPropertySet");
 
+	py::class_<PyPropertySet> pyPropertySet(m, "PyPropertySet");
+	pyPropertySet
+		.def(py::init<>())
+		.def("__iter__", &PyPropertySet::iter, py::keep_alive<0, 1>() /* Essential: keep list alive while iterator exists */)
+		.def("__getitem__", &PyPropertySet::getItem)
+		.def("__setitem__", &PyPropertySet::setItem);
 
 	//TODO
 	// set name of patch/layer
