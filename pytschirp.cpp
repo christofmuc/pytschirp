@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2019 Christof Ruch. All rights reserved.
+   Copyright (c) 2020 Christof Ruch. All rights reserved.
 
    Dual licensed: Distributed under Affero GPL license by default, an MIT license is available for purchase
 */
@@ -26,13 +26,6 @@ public:
 	}
 };
 
-// Configure the template with the various classes for the Rev2
-typedef PyTschirpAttribute PyAttribute_Rev2;
-
-typedef PyTschirp PyTschirp_Rev2;
-
-typedef PyTschirpSynth PyTschirpSynth_Rev2;
-
 midikraft::MidiController *correctMidiController() {
 	return  midikraft::MidiController::instance();
 }
@@ -44,42 +37,42 @@ PYBIND11_MODULE(pytschirp, m) {
 	midiController.def(py::init<>());
 	m.def("midiControllerInstance", &correctMidiController, py::return_value_policy::reference);
 
-	py::class_<PyTschirp_Rev2> rev2_tschirp(m, "Rev2Patch");
+	py::class_<PyTschirp> rev2_tschirp(m, "Rev2Patch");
 	rev2_tschirp.def(py::init<std::shared_ptr<midikraft::Patch>>())
-		.def("attr", &PyTschirp_Rev2::get_attr)
-		.def("__getattr__", &PyTschirp_Rev2::get_attr)
-		.def("__setattr__", py::overload_cast<std::string const &, int>(&PyTschirp_Rev2::set_attr))
-		.def("__setattr__", py::overload_cast<std::string const &, std::vector<int> const &>(&PyTschirp_Rev2::set_attr))
-		.def("__setitem__", py::overload_cast<std::string const &, int>(&PyTschirp_Rev2::set_attr))
-		.def("__setitem__", py::overload_cast<std::string const &, std::vector<int> const &>(&PyTschirp_Rev2::set_attr))
-		.def("__getitem__", &PyTschirp_Rev2::get_attr)
-		.def_property("name", &PyTschirp_Rev2::getName, &PyTschirp_Rev2::setName)
-		.def("layer", &PyTschirp_Rev2::layer)
-		.def("parameterNames", &PyTschirp_Rev2::parameterNames);
+		.def("attr", &PyTschirp::get_attr)
+		.def("__getattr__", &PyTschirp::get_attr)
+		.def("__setattr__", py::overload_cast<std::string const &, int>(&PyTschirp::set_attr))
+		.def("__setattr__", py::overload_cast<std::string const &, std::vector<int> const &>(&PyTschirp::set_attr))
+		.def("__setitem__", py::overload_cast<std::string const &, int>(&PyTschirp::set_attr))
+		.def("__setitem__", py::overload_cast<std::string const &, std::vector<int> const &>(&PyTschirp::set_attr))
+		.def("__getitem__", &PyTschirp::get_attr)
+		.def_property("name", &PyTschirp::getName, &PyTschirp::setName)
+		.def("layer", &PyTschirp::layer)
+		.def("parameterNames", &PyTschirp::parameterNames);
 
 	//TODO
 	// set name of patch/layer
 				
-	py::class_<PyAttribute_Rev2> rev2_attribute(m, "Rev2Attribute");
+	py::class_<PyTschirpAttribute> rev2_attribute(m, "Rev2Attribute");
 	rev2_attribute
-		.def("set", py::overload_cast<int>(&PyAttribute_Rev2::set))
-		.def("set", py::overload_cast<std::vector<int>>(&PyAttribute_Rev2::set))
-		.def("get", &PyAttribute_Rev2::get)
-		.def("asText", &PyAttribute_Rev2::asText)
-		.def("__repr__", &PyAttribute_Rev2::asText)
+		.def("set", py::overload_cast<int>(&PyTschirpAttribute::set))
+		.def("set", py::overload_cast<std::vector<int>>(&PyTschirpAttribute::set))
+		.def("get", &PyTschirpAttribute::get)
+		.def("asText", &PyTschirpAttribute::asText)
+		.def("__repr__", &PyTschirpAttribute::asText)
 		;
 
-	py::class_<PyTschirpSynth_Rev2> pyTschirpSynth(m, "Rev2");
+	py::class_<PyTschirpSynth> pyTschirpSynth(m, "Rev2");
 	pyTschirpSynth
 		.def(py::init<std::shared_ptr<midikraft::Synth>>())
-		.def("detect", &PyTschirpSynth_Rev2::detect)
-		.def("detected", &PyTschirpSynth_Rev2::detected)
-		.def("location", &PyTschirpSynth_Rev2::location)
-		.def("editBuffer", &PyTschirpSynth_Rev2::editBuffer)
-		.def("loadSysex", &PyTschirpSynth_Rev2::loadSysex)
-		.def("saveSysex", &PyTschirpSynth_Rev2::saveSysex)
-		.def("saveEditBuffer", &PyTschirpSynth_Rev2::saveEditBuffer)
-		.def("getGlobalSettings", &PyTschirpSynth_Rev2::getGlobalSettings);
+		.def("detect", &PyTschirpSynth::detect)
+		.def("detected", &PyTschirpSynth::detected)
+		.def("location", &PyTschirpSynth::location)
+		.def("editBuffer", &PyTschirpSynth::editBuffer)
+		.def("loadSysex", &PyTschirpSynth::loadSysex)
+		.def("saveSysex", &PyTschirpSynth::saveSysex)
+		.def("saveEditBuffer", &PyTschirpSynth::saveEditBuffer)
+		.def("getGlobalSettings", &PyTschirpSynth::getGlobalSettings);
 
 	// TODO
 	// sendPatchToEditBuffer
