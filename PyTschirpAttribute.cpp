@@ -8,17 +8,18 @@
 #include "PyTschirpAttribute.h"
 
 #include "SynthParameterDefinition.h"
+#include "DetailedParametersCapability.h"
 
 namespace py = pybind11;
 
 PyTschirpAttribute::PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, std::string const &param) : patch_(patch)
 {
-	//, def_(PATCH::find(param))
+	def_ = defByName(param);
 }
 
 PyTschirpAttribute::PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, std::string const &param, int targetLayerNo) : patch_(patch)
 {
-	// , def_(PATCH::find(param))
+	def_ = defByName(param);
 	auto layerAccess = std::dynamic_pointer_cast<midikraft::SynthMultiLayerParameterCapability>(def_);
 	if (!layerAccess) {
 		throw std::runtime_error("PyTschirp: Program Error: Parameter set does not support multi layers");
@@ -97,4 +98,17 @@ std::string PyTschirpAttribute::asText() const
 std::shared_ptr <midikraft::SynthParameterDefinition> PyTschirpAttribute::def()
 {
 	return def_;
+}
+
+std::shared_ptr<midikraft::SynthParameterDefinition> PyTschirpAttribute::defByName(std::string const &name) const
+{
+	auto params = std::dynamic_pointer_cast<midikraft::DetailedParametersCapability>(patch_);
+	if (params) {
+		for (auto param : params->allParameterDefinitions()) {
+			if (param->name() == name) {
+				return param;
+			}
+		}
+	}
+	return {};
 }

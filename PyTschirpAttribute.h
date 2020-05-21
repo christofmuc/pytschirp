@@ -26,6 +26,8 @@ public:
 	std::shared_ptr <midikraft::SynthParameterDefinition> def();
 
 private:
+	std::shared_ptr<midikraft::SynthParameterDefinition> defByName(std::string const &name) const;
+
 	std::shared_ptr<midikraft::Patch> patch_;
 	std::shared_ptr<midikraft::SynthParameterDefinition> def_;
 };
