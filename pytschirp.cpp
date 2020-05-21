@@ -14,6 +14,7 @@
 #include "PyTschirpSynth.h"
 
 #include <pybind11/pybind11.h>
+//#include <pybind11/embed.h>
 #include <pybind11/stl.h> // For vector to list
 
 namespace py = pybind11;
@@ -30,6 +31,13 @@ midikraft::MidiController *correctMidiController() {
 	return  midikraft::MidiController::instance();
 }
 
+template <typename T> 
+class SynthInstance : public PyTschirpSynth {
+public:
+	SynthInstance() : PyTschirpSynth(std::make_shared<T>()) {
+	}
+};
+
 PYBIND11_MODULE(pytschirp, m) {
 	m.doc() = "Provide PyTschirp bindings for the Sequential Prophet Rev2";
 
@@ -37,7 +45,7 @@ PYBIND11_MODULE(pytschirp, m) {
 	midiController.def(py::init<>());
 	m.def("midiControllerInstance", &correctMidiController, py::return_value_policy::reference);
 
-	py::class_<PyTschirp> rev2_tschirp(m, "Rev2Patch");
+	py::class_<PyTschirp> rev2_tschirp(m, "Patch");
 	rev2_tschirp.def(py::init<std::shared_ptr<midikraft::Patch>>())
 		.def("attr", &PyTschirp::get_attr)
 		.def("__getattr__", &PyTschirp::get_attr)
@@ -53,7 +61,7 @@ PYBIND11_MODULE(pytschirp, m) {
 	//TODO
 	// set name of patch/layer
 				
-	py::class_<PyTschirpAttribute> rev2_attribute(m, "Rev2Attribute");
+	py::class_<PyTschirpAttribute> rev2_attribute(m, "Attribute");
 	rev2_attribute
 		.def("set", py::overload_cast<int>(&PyTschirpAttribute::set))
 		.def("set", py::overload_cast<std::vector<int>>(&PyTschirpAttribute::set))
@@ -62,9 +70,9 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def("__repr__", &PyTschirpAttribute::asText)
 		;
 
-	py::class_<PyTschirpSynth> pyTschirpSynth(m, "Rev2");
+	py::class_<SynthInstance<midikraft::Rev2>> pyTschirpSynth(m, "Rev2");
 	pyTschirpSynth
-		.def(py::init<std::shared_ptr<midikraft::Synth>>())
+		.def(py::init<>())
 		.def("detect", &PyTschirpSynth::detect)
 		.def("detected", &PyTschirpSynth::detected)
 		.def("location", &PyTschirpSynth::location)
