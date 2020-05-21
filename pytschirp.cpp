@@ -27,11 +27,11 @@ public:
 };
 
 // Configure the template with the various classes for the Rev2
-typedef PyTschirpAttribute<midikraft::Rev2Patch, midikraft::Rev2ParamDefinition> PyAttribute_Rev2;
+typedef PyTschirpAttribute PyAttribute_Rev2;
 
-typedef PyTschirp<midikraft::Rev2Patch, PyAttribute_Rev2> PyTschirp_Rev2;
+typedef PyTschirp PyTschirp_Rev2;
 
-typedef PyTschirpSynth<midikraft::Rev2, PyTschirp_Rev2> PyTschirpSynth_Rev2;
+typedef PyTschirpSynth PyTschirpSynth_Rev2;
 
 midikraft::MidiController *correctMidiController() {
 	return  midikraft::MidiController::instance();
@@ -45,7 +45,7 @@ PYBIND11_MODULE(pytschirp, m) {
 	m.def("midiControllerInstance", &correctMidiController, py::return_value_policy::reference);
 
 	py::class_<PyTschirp_Rev2> rev2_tschirp(m, "Rev2Patch");
-	rev2_tschirp.def(py::init<>())
+	rev2_tschirp.def(py::init<std::shared_ptr<midikraft::Patch>>())
 		.def("attr", &PyTschirp_Rev2::get_attr)
 		.def("__getattr__", &PyTschirp_Rev2::get_attr)
 		.def("__setattr__", py::overload_cast<std::string const &, int>(&PyTschirp_Rev2::set_attr))
@@ -71,7 +71,7 @@ PYBIND11_MODULE(pytschirp, m) {
 
 	py::class_<PyTschirpSynth_Rev2> pyTschirpSynth(m, "Rev2");
 	pyTschirpSynth
-		.def(py::init<>())
+		.def(py::init<std::shared_ptr<midikraft::Synth>>())
 		.def("detect", &PyTschirpSynth_Rev2::detect)
 		.def("detected", &PyTschirpSynth_Rev2::detected)
 		.def("location", &PyTschirpSynth_Rev2::location)

@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2019 Christof Ruch. All rights reserved.
+   Copyright (c) 2020 Christof Ruch. All rights reserved.
 
    Dual licensed: Distributed under Affero GPL license by default, an MIT license is available for purchase
 */
@@ -17,17 +17,18 @@
 
 namespace py = pybind11;
 
+#include "PyTschirpAttribute.h"
+
 //TODO - should this really be a template class, or should this work with polymorphism?
-template<typename PATCH, typename ATTRIBUTE>
 class PyTschirp {	
 public:
-	PyTschirp() {
-		patch_ = std::make_shared<PATCH>();
+	PyTschirp(std::shared_ptr<midikraft::Patch> patch) {
+		patch_ = patch;
 	}
 
-	PyTschirp(std::shared_ptr<midikraft::Patch> p, std::weak_ptr<midikraft::Synth> synth) {
+	PyTschirp(std::shared_ptr<midikraft::DataFile> p, std::weak_ptr<midikraft::Synth> synth) {
 		// Downcast possible?
-		auto correctPatch = std::dynamic_pointer_cast<PATCH>(p);
+		auto correctPatch = std::dynamic_pointer_cast<midikraft::Patch>(p);
 		if (!correctPatch) {
 			throw std::runtime_error("PyTschirp: Program error: Can't downcast, wrong patch type!");
 		}
@@ -35,45 +36,45 @@ public:
 		synth_ = synth;
 	}
 
-	ATTRIBUTE get_attr(std::string const &attrName) {
+	PyTschirpAttribute get_attr(std::string const &attrName) {
 		if (layerNo_ == -1) {
-			return ATTRIBUTE(patch_, attrName);
+			return PyTschirpAttribute(patch_, attrName);
 		}
 		else {
-			return ATTRIBUTE(patch_, attrName, layerNo_);
+			return PyTschirpAttribute(patch_, attrName, layerNo_);
 		}
 	}
 
 	void set_attr(std::string const &name, int value) {
-		auto attr = ATTRIBUTE(patch_, name);
+		auto attr = PyTschirpAttribute(patch_, name);
 		attr.set(value);
-		if (!synth_.expired() && synth_.lock()->channel().isValid()) {
+		if (isChannelValid()) {
 			auto liveEditing = std::dynamic_pointer_cast<midikraft::SynthParameterLiveEditCapability>(attr.def());
 			if (liveEditing) {
 				// The synth is hot... we don't know if this patch is currently selected, but let's send the nrpn or other value changing message anyway!
 				auto messages = liveEditing->setValueMessages(*patch_, synth_.lock().get());
-				midikraft::MidiController::instance()->getMidiOutput(synth_.lock()->midiOutput())->sendBlockOfMessagesNow(messages);
+				midikraft::MidiController::instance()->getMidiOutput(midiOutput())->sendBlockOfMessagesNow(messages);
 			}
 		}
 	}
 
 	void set_attr(std::string const &name, std::vector<int> const &value) {
-		auto attr = ATTRIBUTE(patch_, name);
+		auto attr = PyTschirpAttribute(patch_, name);
 		attr.set(value);
 
-		if (!synth_.expired() && synth_.lock()->channel().isValid()) {
+		if (isChannelValid()) {
 			auto liveEditing = std::dynamic_pointer_cast<midikraft::SynthParameterLiveEditCapability>(attr.def());
 			if (liveEditing) {
 				// The synth is hot... we don't know if this patch is currently selected, but let's send the nrpn or other value changing message anyway!
 				auto messages = liveEditing->setValueMessages(*patch_, synth_.lock().get());
-				midikraft::MidiController::instance()->getMidiOutput(synth_.lock()->midiOutput())->sendBlockOfMessagesNow(messages);
+				midikraft::MidiController::instance()->getMidiOutput(midiOutput())->sendBlockOfMessagesNow(messages);
 			}
 		}
 	}
 
 	std::string getName() {
 		if (layerNo_ == -1) {
-			return patch_->patchName();
+			return patch_->name();
 		}
 		else {
 			auto layeredPatch = std::dynamic_pointer_cast<midikraft::LayeredPatch>(patch_);
@@ -87,7 +88,10 @@ public:
 	}
 
 	void setName(std::string const &newName) {
-		patch_->setName(newName);
+		auto storedName = std::dynamic_pointer_cast<midikraft::StoredPatchNameCapability>(patch_);
+		if (patch_) {
+			storedName->setName(newName);
+		}
 	}
 
 	PyTschirp layer(int layerNo) {
@@ -106,15 +110,17 @@ public:
 
 	std::vector<std::string> parameterNames() {
 		std::vector<std::string> result;
-		for (auto p : patch_->allParameterDefinitions()) {
-			result.push_back(p->name());
+		auto params = std::dynamic_pointer_cast<midikraft::DetailedParametersCapability>(patch_);
+		if (params) {
+			for (auto p : params->allParameterDefinitions()) {
+				result.push_back(p->name());
+			}
 		}
 		return result;
 	}
 
-
 	//! Use this at your own risk
-	std::shared_ptr<PATCH> patchPtr() {
+	std::shared_ptr<midikraft::Patch> patchPtr() {
 		return patch_;
 	}
 
@@ -137,7 +143,37 @@ private:
 		return copy;
 	}
 
-	std::shared_ptr<PATCH> patch_;
+	std::string midiInput() {
+		if (!synth_.expired()) {
+			auto location = std::dynamic_pointer_cast<midikraft::MidiLocationCapability>(synth_.lock());
+			if (location) {
+				return location->midiInput();
+			}
+		}
+		return "invalid";
+	}
+
+	std::string midiOutput() {
+		if (!synth_.expired()) {
+			auto location = std::dynamic_pointer_cast<midikraft::MidiLocationCapability>(synth_.lock());
+			if (location) {
+				return location->midiOutput();
+			}
+		}
+		return "invalid";
+	}
+
+	bool isChannelValid() const {
+		if (!synth_.expired()) {
+			auto location = std::dynamic_pointer_cast<midikraft::MidiLocationCapability>(synth_.lock());
+			if (location) {
+				return location->channel().isValid();
+			}
+		}
+		return false;
+	}
+
+	std::shared_ptr<midikraft::Patch> patch_;
 	std::weak_ptr<midikraft::Synth> synth_;
 	int layerNo_ = -1; // -1 means no layer is selected, access the whole patch. Else, this is the layer number this Tschirp represents
 };

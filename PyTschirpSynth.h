@@ -12,30 +12,29 @@
 #include "Sysex.h"
 #include "Librarian.h"
 
-template<typename SYNTH, typename TSCHIRP>
 class PyTschirpSynth {
 public:
-	PyTschirpSynth() {
-		synth_ = std::make_shared<SYNTH>();
+	PyTschirpSynth(std::shared_ptr<midikraft::Synth> synth) {
+		synth_ = synth;
 	}
 
 	void detect() {
 		std::vector<std::shared_ptr<midikraft::SimpleDiscoverableDevice>> list;
-		list.push_back(synth_);
+		list.push_back(std::dynamic_pointer_cast<midikraft::SimpleDiscoverableDevice>(synth_));
 		midikraft::AutoDetection autodetection;
 		autodetection.autoconfigure(list, nullptr);
 	}
 
 	bool detected() {
-		return synth_->channel().isValid();
+		return channel().isValid();
 	}
 
 	std::string location() const {
-		auto result = String("MIDI IN: ") + synth_->midiInput() + String(", MIDI OUT: ") + synth_->midiOutput();
+		auto result = String("MIDI IN: ") + String(midiInput()) + String(", MIDI OUT: ") + String(midiOutput());
 		return result.toStdString();
 	}
 
-	TSCHIRP editBuffer() {
+	PyTschirp editBuffer() {
 		if (!detected()) {
 			throw std::runtime_error("PyTschirp: Synth hasn't been detected yet - run detect() first and check if it worked");
 		}
@@ -45,7 +44,7 @@ public:
 		if (editBufferCapability) {
 			// Block until we get the edit buffer back from the synth!
 			auto request = editBufferCapability->requestEditBufferDump();
-			midikraft::MidiRequest requester(synth_->midiOutput(), request, [editBufferCapability](MidiMessage const &message) {
+			midikraft::MidiRequest requester(midiOutput(), request, [editBufferCapability](MidiMessage const &message) {
 				return editBufferCapability->isEditBufferDump(message);
 			});
 
@@ -58,7 +57,8 @@ public:
 			if (!patches[0]) {
 				throw std::runtime_error("PyTschirp: Failed to parse edit buffer, program error!");
 			}
-			return TSCHIRP(patches[0], synth_);
+			
+			return PyTschirp(patches[0], synth_);
 		}
 		else {
 			std::cerr << "The " << synth_->getName() << " has no capability to recall the edit buffer, failed." << std::endl;
@@ -66,18 +66,18 @@ public:
 		}
 	}
 
-	std::vector<TSCHIRP> loadSysex(std::string const &filename) {
+	std::vector<PyTschirp> loadSysex(std::string const &filename) {
 		auto midimessages = Sysex::loadSysex(filename);
 		auto patches = synth_->loadSysex(midimessages);
 		
-		std::vector<TSCHIRP> result;
+		std::vector<PyTschirp> result;
 		for (auto patch : patches) {
 			result.emplace_back(patch, synth_);
 		}
 		return result;
 	}
 
-	void saveSysex(std::string const &filename, std::vector <TSCHIRP> &patches) {
+	void saveSysex(std::string const &filename, std::vector <PyTschirp> &patches) {
 		auto pdc = std::dynamic_pointer_cast<midikraft::ProgramDumpCabability>(synth_);
 		if (pdc) {
 			std::vector<MidiMessage> result;
@@ -92,7 +92,7 @@ public:
 		}
 	}
 
-	void saveEditBuffer(std::string const &filename, TSCHIRP &patch) {
+	void saveEditBuffer(std::string const &filename, PyTschirp &patch) {
 		auto ebc = std::dynamic_pointer_cast<midikraft::EditBufferCapability>(synth_);
 		if (ebc) {
 			auto midiMessages = ebc->patchToSysex(*patch.patchPtr());
@@ -104,17 +104,43 @@ public:
 	}
 
 	void getGlobalSettings() {
-		std::vector<midikraft::SynthHolder> synths({ midikraft::SynthHolder(synth_) });
+		auto discoverableDevice = std::dynamic_pointer_cast<midikraft::SimpleDiscoverableDevice>(synth_);
+		if (!discoverableDevice) {
+			//TODO - this shouldn't happen too often?
+			return;
+
+		}
+		std::vector<midikraft::SynthHolder> synths({ midikraft::SynthHolder(discoverableDevice, Colours::black) });
 		midikraft::Librarian librarian(synths);
 		bool done = false;
-		librarian.startDownloadingSequencerData(midikraft::MidiController::instance()->getMidiOutput(synth_->midiOutput()), synth_.get(), 0, nullptr, [this, &done]() {
-			done = true;
-		});
+
+		auto dataFileLoad = std::dynamic_pointer_cast<midikraft::DataFileLoadCapability>(synth_);
+		if (dataFileLoad) {
+			//TODO - how to determine the data file type for the global settings? I don't think this will work. 
+			librarian.startDownloadingSequencerData(midikraft::MidiController::instance()->getMidiOutput(midiOutput()), dataFileLoad.get(), 0, nullptr, [this, &done](std::vector<std::shared_ptr<midikraft::DataFile>>) {
+				done = true;
+			});
+		}
 		midikraft::MidiRequest::blockUntilTrue([&done]() { return done;  }, 2000);
 	}
 
 private:
-	std::shared_ptr<SYNTH> synth_;
+	std::string midiInput() const {
+		auto midiLocation = std::dynamic_pointer_cast<midikraft::MidiLocationCapability>(synth_);
+		return midiLocation ? midiLocation->midiInput() : "invalid";
+	}
+
+	std::string midiOutput() const {
+		auto midiLocation = std::dynamic_pointer_cast<midikraft::MidiLocationCapability>(synth_);
+		return midiLocation ? midiLocation->midiOutput() : "invalid";
+	}
+
+	MidiChannel channel() const {
+		auto midiLocation = std::dynamic_pointer_cast<midikraft::MidiLocationCapability>(synth_);
+		return midiLocation ? midiLocation->channel() : MidiChannel::invalidChannel();
+	}
+
+	std::shared_ptr<midikraft::Synth> synth_;
 };
 
 

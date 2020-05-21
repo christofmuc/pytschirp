@@ -8,13 +8,14 @@
 
 #include "JuceHeader.h"
 
-template<typename PATCH, typename SYNTHPARAM>
 class PyTschirpAttribute {
 public:
-	PyTschirpAttribute(std::shared_ptr<PATCH> patch, std::string const &param) : patch_(patch), def_(PATCH::find(param)) {
+	PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, std::string const &param) : patch_(patch) {
+		//, def_(PATCH::find(param))
 	}
 
-	PyTschirpAttribute(std::shared_ptr<PATCH> patch, std::string const &param, int targetLayerNo) : patch_(patch), def_(PATCH::find(param)) {
+	PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, std::string const &param, int targetLayerNo) : patch_(patch) {
+		// , def_(PATCH::find(param))
 		auto layerAccess = std::dynamic_pointer_cast<midikraft::SynthMultiLayerParameterCapability>(def_);
 		if (!layerAccess) {
 			throw std::runtime_error("PyTschirp: Program Error: Parameter set does not support multi layers");
@@ -92,7 +93,7 @@ public:
 	}
 
 private:
-	std::shared_ptr<PATCH> patch_;
-	std::shared_ptr <midikraft::SynthParameterDefinition> def_;
+	std::shared_ptr<midikraft::Patch> patch_;
+	std::shared_ptr<midikraft::SynthParameterDefinition> def_;
 };
 
