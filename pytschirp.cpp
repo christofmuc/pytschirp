@@ -107,7 +107,8 @@ PYBIND11_MODULE(pytschirp, m) {
 		.def("loadSysex", &PyTschirpSynth_Rev2::loadSysex)
 		.def("saveSysex", &PyTschirpSynth_Rev2::saveSysex)
 		.def("saveEditBuffer", &PyTschirpSynth_Rev2::saveEditBuffer)
-		.def("getGlobalSettings", &PyTschirpSynth_Rev2::getGlobalSettings);
+		.def("getGlobalSettings", &PyTschirpSynth_Rev2::getGlobalSettings)
+		.def("getAlternateTunings", &PyTschirpSynth_Rev2::getAlternateTunings);
 
 	// TODO
 	// sendPatchToEditBuffer

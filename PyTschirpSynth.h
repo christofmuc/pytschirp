@@ -116,6 +116,17 @@ public:
 		return PyPropertySet(synth_->getGlobalSettings());
 	}
 
+	std::vector<PyPropertySet> getAlternateTunings() {
+		std::vector<midikraft::SynthHolder> synths({ midikraft::SynthHolder(synth_) });
+		midikraft::Librarian librarian(synths);
+		bool done = false;
+		librarian.startDownloadingSequencerData(midikraft::MidiController::instance()->getMidiOutput(synth_->midiOutput()), synth_.get(), midikraft::Rev2::ALTERNATE_TUNING, nullptr, [this, &done]() {
+			done = true;
+		});
+		midikraft::MidiRequest::blockUntilTrue([&done]() { return done;  }, 2000);
+		return { PyPropertySet(synth_->getGlobalSettings()) };
+	}
+
 private:
 	std::shared_ptr<SYNTH> synth_;
 };
