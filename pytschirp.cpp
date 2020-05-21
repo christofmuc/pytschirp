@@ -9,7 +9,7 @@
 #include "Rev2.h"
 #include "Rev2Patch.h"
 
-#include "PyTschirp.h"
+#include "PyTschirpPatch.h"
 #include "PyTschirpAttribute.h"
 #include "PyTschirpSynth.h"
 

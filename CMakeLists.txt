@@ -23,9 +23,9 @@ IF(NOT DEFINED JUCE_LIBRARIES)
 ENDIF()
 
 set(SOURCES
-	PyTschirp.h
-	PyTschirpAttribute.h
-	PyTschirpSynth.h
+	PyTschirpPatch.cpp PyTschirpPatch.h
+	PyTschirpAttribute.cpp PyTschirpAttribute.h
+	PyTschirpSynth.cpp PyTschirpSynth.h
 	pytschirp.cpp
 )
 
