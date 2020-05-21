@@ -25,6 +25,7 @@ PyTschirpAttribute::PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, 
 		throw std::runtime_error("PyTschirp: Program Error: Parameter set does not support multi layers");
 	}
 	// This parameter definition targets a specific layer. This is used e.g. to access either Layer A or Layer B of a Prophet Rev2
+	layerAccess->setSourceLayer(targetLayerNo);
 	layerAccess->setTargetLayer(targetLayerNo);
 }
 
