@@ -66,3 +66,12 @@ PYBIND11_EMBEDDED_MODULE(pytschirpee, m) {
 void globalImportEmbeddedModules() {
 	py::module::import("pytschirpee");
 }
+
+std::string findPyTschirpModuleForSynth(std::string const &synthName)
+{
+	midikraft::Rev2 rev2;
+	if (synthName == rev2.getName()) {
+		return "Rev2";
+	}
+	return "";
+}

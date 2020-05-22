@@ -6,5 +6,9 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 void globalImportEmbeddedModules();
+std::string findPyTschirpModuleForSynth(std::string const &synthName);
 
