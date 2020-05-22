@@ -29,8 +29,12 @@ set(SOURCES
 )
 
 add_library(pytschirplib ${SOURCES})
-target_link_libraries(pytschirplib PRIVATE pybind11 juce-utils midikraft-base midikraft-librarian midikraft-sequential-rev2)
+target_link_libraries(pytschirplib PRIVATE pybind11 juce-utils midikraft-base midikraft-librarian)
 target_include_directories(pytschirplib PRIVATE ${JUCE_INCLUDES})
+
+add_library(pytschirp_embedded embedded_module.cpp embedded_module.h)
+target_link_libraries(pytschirp_embedded PRIVATE pybind11 pytschirplib juce-utils midikraft-base midikraft-librarian midikraft-sequential-rev2)
+target_include_directories(pytschirp_embedded PUBLIC ${CMAKE_CURRENT_LIST_DIR} PRIVATE ${JUCE_INCLUDES})
 
 pybind11_add_module(pytschirp pytschirp.cpp)
 target_link_libraries(pytschirp PRIVATE pytschirplib juce-utils midikraft-base midikraft-librarian midikraft-sequential-rev2 ${JUCE_LIBRARIES})
