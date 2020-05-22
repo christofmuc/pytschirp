@@ -26,11 +26,14 @@ set(SOURCES
 	PyTschirpPatch.cpp PyTschirpPatch.h
 	PyTschirpAttribute.cpp PyTschirpAttribute.h
 	PyTschirpSynth.cpp PyTschirpSynth.h
-	pytschirp.cpp
 )
 
-pybind11_add_module(pytschirp ${SOURCES})
-target_link_libraries(pytschirp PRIVATE juce-utils midikraft-base midikraft-librarian midikraft-sequential-rev2 ${JUCE_LIBRARIES})
+add_library(pytschirplib ${SOURCES})
+target_link_libraries(pytschirplib PRIVATE pybind11 juce-utils midikraft-base midikraft-librarian midikraft-sequential-rev2)
+target_include_directories(pytschirplib PRIVATE ${JUCE_INCLUDES})
+
+pybind11_add_module(pytschirp pytschirp.cpp)
+target_link_libraries(pytschirp PRIVATE pytschirplib juce-utils midikraft-base midikraft-librarian midikraft-sequential-rev2 ${JUCE_LIBRARIES})
 set_target_properties(pytschirp PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                          SUFFIX "${PYTHON_MODULE_EXTENSION}")
 
