@@ -28,23 +28,28 @@ set(SOURCES
 	PyTschirpSynth.cpp PyTschirpSynth.h
 )
 
+set(SYNTHMODULES
+	midikraft-kawai-k3
+	midikraft-sequential-rev2
+)
+
 add_library(pytschirplib ${SOURCES})
 target_link_libraries(pytschirplib PRIVATE pybind11 juce-utils midikraft-base midikraft-librarian)
 target_include_directories(pytschirplib PRIVATE ${JUCE_INCLUDES})
 
 add_library(pytschirp_embedded embedded_module.cpp embedded_module.h)
-target_link_libraries(pytschirp_embedded PRIVATE pybind11 pytschirplib juce-utils midikraft-base midikraft-librarian midikraft-sequential-rev2)
+target_link_libraries(pytschirp_embedded PRIVATE pybind11 pytschirplib juce-utils midikraft-base midikraft-librarian ${SYNTHMODULES})
 target_include_directories(pytschirp_embedded PUBLIC ${CMAKE_CURRENT_LIST_DIR} PRIVATE ${JUCE_INCLUDES})
 
 pybind11_add_module(pytschirp pytschirp.cpp)
-target_link_libraries(pytschirp PRIVATE pytschirplib juce-utils midikraft-base midikraft-librarian midikraft-sequential-rev2 ${JUCE_LIBRARIES})
+target_link_libraries(pytschirp PRIVATE pytschirplib juce-utils midikraft-base midikraft-librarian ${SYNTHMODULES} ${JUCE_LIBRARIES})
 set_target_properties(pytschirp PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                          SUFFIX "${PYTHON_MODULE_EXTENSION}")
 
 add_executable(testExe test.cpp)
 
 IF(WIN32)
-	target_link_libraries(testExe PRIVATE juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES})
+	target_link_libraries(testExe PRIVATE juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES})
 ELSEIF(UNIX)
 	target_link_libraries(testExe PRIVATE 		
 		#PkgConfig::WEBKIT 
@@ -56,6 +61,8 @@ ELSEIF(UNIX)
 		#freetype 
 		curl 
 		asound 
-		juce-utils midikraft-base midikraft-sequential-rev2 ${JUCE_LIBRARIES}
+		juce-utils midikraft-base 
+		${SYNTHMODULES}
+		${JUCE_LIBRARIES}
 		)
 ENDIF()

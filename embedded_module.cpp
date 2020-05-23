@@ -11,6 +11,7 @@
 #include "PyTschirpSynth.h"
 
 #include "Rev2.h"
+#include "KawaiK3.h"
 
 #include <pybind11/embed.h>
 #include <pybind11/stl.h> // For vector to list
@@ -23,6 +24,21 @@ public:
 	SynthInstance() : PyTschirpSynth(std::make_shared<T>()) {
 	}
 };
+
+template <typename S, typename M>
+void defineSynth(M m, const char *pythonClassName) {
+	py::class_<SynthInstance<S>> pyTschirpSynth(m, pythonClassName);
+	pyTschirpSynth
+		.def(py::init<>())
+		.def("detect", &PyTschirpSynth::detect)
+		.def("detected", &PyTschirpSynth::detected)
+		.def("location", &PyTschirpSynth::location)
+		.def("editBuffer", &PyTschirpSynth::editBuffer)
+		.def("loadSysex", &PyTschirpSynth::loadSysex)
+		.def("saveSysex", &PyTschirpSynth::saveSysex)
+		.def("saveEditBuffer", &PyTschirpSynth::saveEditBuffer)
+		.def("getGlobalSettings", &PyTschirpSynth::getGlobalSettings);
+}
 
 PYBIND11_EMBEDDED_MODULE(pytschirpee, m) {
 	m.doc() = "Provide PyTschirp bindings for the KnobKraft Orm";
@@ -49,18 +65,8 @@ PYBIND11_EMBEDDED_MODULE(pytschirpee, m) {
 		.def("__repr__", &PyTschirpAttribute::asText)
 		;
 
-	py::class_<SynthInstance<midikraft::Rev2>> pyTschirpSynth(m, "Rev2");
-	pyTschirpSynth
-		.def(py::init<>())
-		.def("detect", &PyTschirpSynth::detect)
-		.def("detected", &PyTschirpSynth::detected)
-		.def("location", &PyTschirpSynth::location)
-		.def("editBuffer", &PyTschirpSynth::editBuffer)
-		.def("loadSysex", &PyTschirpSynth::loadSysex)
-		.def("saveSysex", &PyTschirpSynth::saveSysex)
-		.def("saveEditBuffer", &PyTschirpSynth::saveEditBuffer)
-		.def("getGlobalSettings", &PyTschirpSynth::getGlobalSettings);
-
+	defineSynth<midikraft::Rev2>(m, "Rev2");
+	defineSynth<midikraft::KawaiK3>(m, "K3");
 }
 
 void globalImportEmbeddedModules() {
@@ -72,6 +78,10 @@ std::string findPyTschirpModuleForSynth(std::string const &synthName)
 	midikraft::Rev2 rev2;
 	if (synthName == rev2.getName()) {
 		return "Rev2";
+	}
+	midikraft::KawaiK3 k3;
+	if (synthName == k3.getName()) {
+		return "K3";
 	}
 	return "";
 }
