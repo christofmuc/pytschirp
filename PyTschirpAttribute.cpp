@@ -54,7 +54,7 @@ void PyTschirpAttribute::set(std::vector<int> data)
 py::object PyTschirpAttribute::get() const
 {
 	if (!def_) {
-		throw std::runtime_error("PyTschirp: get() operation called on unknown attribute");
+		return py::none();
 	}
 	if ((def_->type() == midikraft::SynthParameterDefinition::ParamType::INT_ARRAY)
 		|| (def_->type() == midikraft::SynthParameterDefinition::ParamType::LOOKUP_ARRAY))
