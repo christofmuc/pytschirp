@@ -46,9 +46,8 @@ target_link_libraries(pytschirp PRIVATE pytschirplib juce-utils midikraft-base m
 set_target_properties(pytschirp PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                          SUFFIX "${PYTHON_MODULE_EXTENSION}")
 
-add_executable(testExe test.cpp)
-
 IF(WIN32)
+	add_executable(testExe test.cpp)
 	target_link_libraries(testExe PRIVATE juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES})
 ENDIF()
 
