@@ -50,19 +50,5 @@ add_executable(testExe test.cpp)
 
 IF(WIN32)
 	target_link_libraries(testExe PRIVATE juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES})
-ELSEIF(UNIX)
-	target_link_libraries(testExe PRIVATE 		
-		#PkgConfig::WEBKIT 
-		#PkgConfig::GTK 
-		#PkgConfig::GLEW 
-		#Xext 
-		#X11 
-		pthread dl	
-		#freetype 
-		curl 
-		asound 
-		juce-utils midikraft-base 
-		${SYNTHMODULES}
-		${JUCE_LIBRARIES}
-		)
 ENDIF()
+
