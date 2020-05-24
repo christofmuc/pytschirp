@@ -48,6 +48,10 @@ set(SYNTHMODULES
 )
 
 add_library(pytschirplib ${SOURCES})
+IF(UNIX)
+	# Required for the Linux version of the library to avoid a linker error when building the python module
+	set_property(TARGET pytschirplib PROPERTY POSITION_INDEPENDENT_CODE ON) 
+ENDIF()
 target_link_libraries(pytschirplib PRIVATE pybind11 juce-utils midikraft-base midikraft-librarian)
 target_include_directories(pytschirplib PRIVATE ${JUCE_INCLUDES})
 
