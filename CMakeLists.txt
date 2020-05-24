@@ -21,6 +21,20 @@ IF(NOT DEFINED JUCE_LIBRARIES)
 			juce_cryptography # MD5
 	)
 ENDIF()
+IF (NOT DEFINED JUCE_LINUX_LINK_LIBRARIES)
+	# They normally should be set by the top level module
+	set(LINUX_JUCE_LINK_LIBRARIES
+		PkgConfig::WEBKIT 
+		PkgConfig::GTK 
+		PkgConfig::GLEW 
+		Xext 
+		X11 
+		pthread 
+		${CMAKE_DL_LIBS} 
+		freetype 
+		curl 
+		asound)
+ENDIF()
 
 set(SOURCES
 	PyTschirpPatch.cpp PyTschirpPatch.h
@@ -42,12 +56,23 @@ target_link_libraries(pytschirp_embedded PRIVATE pybind11 pytschirplib juce-util
 target_include_directories(pytschirp_embedded PUBLIC ${CMAKE_CURRENT_LIST_DIR} PRIVATE ${JUCE_INCLUDES})
 
 pybind11_add_module(pytschirp pytschirp.cpp)
-target_link_libraries(pytschirp PRIVATE pytschirplib juce-utils midikraft-base midikraft-librarian ${SYNTHMODULES} ${JUCE_LIBRARIES})
 set_target_properties(pytschirp PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                          SUFFIX "${PYTHON_MODULE_EXTENSION}")
-
 IF(WIN32)
-	add_executable(testExe test.cpp)
+	target_link_libraries(pytschirp PRIVATE pytschirplib juce-utils midikraft-base midikraft-librarian ${SYNTHMODULES} ${JUCE_LIBRARIES})
+ELSE()
+	target_link_libraries(pytschirp PRIVATE 
+		pytschirplib juce-utils midikraft-base midikraft-librarian 
+		${SYNTHMODULES} 
+		${JUCE_LIBRARIES}
+		${LINUX_JUCE_LINK_LIBRARIES}
+		)
+ENDIF()
+
+add_executable(testExe test.cpp)
+IF(WIN32)	
 	target_link_libraries(testExe PRIVATE juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES})
+ELSE()
+	target_link_libraries(testExe PRIVATE juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES} ${LINUX_JUCE_LINK_LIBRARIES})
 ENDIF()
 
