@@ -60,8 +60,8 @@ void PyTschirp::set_attr(std::string const &name, std::vector<int> const &value)
 		auto liveEditing = std::dynamic_pointer_cast<midikraft::SynthParameterLiveEditCapability>(attr.def());
 		if (liveEditing) {
 			// The synth is hot... we don't know if this patch is currently selected, but let's send the nrpn or other value changing message anyway!
-			auto messages = liveEditing->setValueMessages(*patch_, synth_.lock().get());
-			midikraft::MidiController::instance()->getMidiOutput(midiOutput())->sendBlockOfMessagesNow(messages);
+			auto messages = liveEditing->setValueMessages(patch_, synth_.lock().get());
+			synth_.lock()->sendBlockOfMessagesToSynth(midiOutput(), messages);
 		}
 	}
 }
@@ -74,8 +74,8 @@ void PyTschirp::set_attr(std::string const &name, int value)
 		auto liveEditing = std::dynamic_pointer_cast<midikraft::SynthParameterLiveEditCapability>(attr.def());
 		if (liveEditing) {
 			// The synth is hot... we don't know if this patch is currently selected, but let's send the nrpn or other value changing message anyway!
-			auto messages = liveEditing->setValueMessages(*patch_, synth_.lock().get());
-			midikraft::MidiController::instance()->getMidiOutput(midiOutput())->sendBlockOfMessagesNow(messages);
+			auto messages = liveEditing->setValueMessages(patch_, synth_.lock().get());
+			synth_.lock()->sendBlockOfMessagesToSynth(midiOutput(), messages);
 		}
 	}
 }
