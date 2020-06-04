@@ -64,6 +64,8 @@ set_target_properties(pytschirp PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                          SUFFIX "${PYTHON_MODULE_EXTENSION}")
 IF(WIN32)
 	target_link_libraries(pytschirp PRIVATE pytschirplib juce-utils midikraft-base midikraft-librarian ${SYNTHMODULES} ${JUCE_LIBRARIES})
+ELSEIF(APPLE)
+	target_link_libraries(pytschirp PRIVATE pytschirplib juce-utils midikraft-base midikraft-librarian ${SYNTHMODULES} ${JUCE_LIBRARIES})
 ELSE()
 	target_link_libraries(pytschirp PRIVATE 
 		pytschirplib juce-utils midikraft-base midikraft-librarian 
@@ -75,6 +77,8 @@ ENDIF()
 
 add_executable(testExe test.cpp)
 IF(WIN32)	
+	target_link_libraries(testExe PRIVATE juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES})
+ELSEIF(APPLE)
 	target_link_libraries(testExe PRIVATE juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES})
 ELSE()
 	target_link_libraries(testExe PRIVATE juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES} ${LINUX_JUCE_LINK_LIBRARIES})
