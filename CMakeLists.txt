@@ -8,19 +8,6 @@ cmake_minimum_required(VERSION 3.14)
 
 project(PyTschirp)
 
-IF(NOT DEFINED JUCE_LIBRARIES)
-	SET(JUCE_DIR_HINT "${CMAKE_CURRENT_LIST_DIR}/../third_party")
-	find_package(JUCE REQUIRED 
-		COMPONENTS 
-			juce_core		
-			juce_events
-			juce_audio_basics
-			juce_audio_devices
-			juce_data_structures
-			juce_gui_basics # Colour
-			juce_cryptography # MD5
-	)
-ENDIF()
 IF (NOT DEFINED JUCE_LINUX_LINK_LIBRARIES)
 	# They normally should be set by the top level module
 	set(LINUX_JUCE_LINK_LIBRARIES
