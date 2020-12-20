@@ -6,6 +6,8 @@
 
 #include "PyTschirpSynth.h"
 
+#include "Capability.h"
+
 #include "SimpleDiscoverableDevice.h"
 #include "ProgramDumpCapability.h"
 
@@ -46,7 +48,7 @@ PyTschirp PyTschirpSynth::editBuffer()
 	}
 
 	// Let's see if this is possible
-	auto editBufferCapability = std::dynamic_pointer_cast<midikraft::EditBufferCapability>(synth_);
+	auto editBufferCapability = midikraft::Capability::hasCapability<midikraft::EditBufferCapability>(synth_);
 	if (editBufferCapability) {
 		// Block until we get the edit buffer back from the synth!
 		auto request = editBufferCapability->requestEditBufferDump();
@@ -86,7 +88,7 @@ std::vector<PyTschirp> PyTschirpSynth::loadSysex(std::string const &filename)
 
 void PyTschirpSynth::saveSysex(std::string const &filename, std::vector <PyTschirp> &patches)
 {
-	auto pdc = std::dynamic_pointer_cast<midikraft::ProgramDumpCabability>(synth_);
+	auto pdc = midikraft::Capability::hasCapability<midikraft::ProgramDumpCabability>(synth_);
 	if (pdc) {
 		std::vector<MidiMessage> result;
 		for (auto tschirp : patches) {
@@ -102,7 +104,7 @@ void PyTschirpSynth::saveSysex(std::string const &filename, std::vector <PyTschi
 
 void PyTschirpSynth::saveEditBuffer(std::string const &filename, PyTschirp &patch)
 {
-	auto ebc = std::dynamic_pointer_cast<midikraft::EditBufferCapability>(synth_);
+	auto ebc = midikraft::Capability::hasCapability<midikraft::EditBufferCapability>(synth_);
 	if (ebc) {
 		auto midiMessages = ebc->patchToSysex(*patch.patchPtr());
 		Sysex::saveSysex(filename, midiMessages);
@@ -124,7 +126,7 @@ void PyTschirpSynth::getGlobalSettings()
 	midikraft::Librarian librarian(synths);
 	bool done = false;
 
-	auto dataFileLoad = std::dynamic_pointer_cast<midikraft::DataFileLoadCapability>(synth_);
+	auto dataFileLoad = midikraft::Capability::hasCapability<midikraft::DataFileLoadCapability>(synth_);
 	if (dataFileLoad) {
 		//TODO - how to determine the data file type for the global settings? I don't think this will work. 
 		librarian.startDownloadingSequencerData(midikraft::MidiController::instance()->getMidiOutput(midiOutput()), dataFileLoad.get(), 0, nullptr, [this, &done](std::vector<std::shared_ptr<midikraft::DataFile>>) {
@@ -136,18 +138,18 @@ void PyTschirpSynth::getGlobalSettings()
 
 std::string PyTschirpSynth::midiInput() const
 {
-	auto midiLocation = std::dynamic_pointer_cast<midikraft::MidiLocationCapability>(synth_);
+	auto midiLocation = midikraft::Capability::hasCapability<midikraft::MidiLocationCapability>(synth_);
 	return midiLocation ? midiLocation->midiInput() : "invalid";
 }
 
 std::string PyTschirpSynth::midiOutput() const
 {
-	auto midiLocation = std::dynamic_pointer_cast<midikraft::MidiLocationCapability>(synth_);
+	auto midiLocation = midikraft::Capability::hasCapability<midikraft::MidiLocationCapability>(synth_);
 	return midiLocation ? midiLocation->midiOutput() : "invalid";
 }
 
 MidiChannel PyTschirpSynth::channel() const
 {
-	auto midiLocation = std::dynamic_pointer_cast<midikraft::MidiLocationCapability>(synth_);
+	auto midiLocation = midikraft::Capability::hasCapability<midikraft::MidiLocationCapability>(synth_);
 	return midiLocation ? midiLocation->channel() : MidiChannel::invalidChannel();
 }
