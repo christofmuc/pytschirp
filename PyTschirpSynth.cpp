@@ -91,8 +91,9 @@ void PyTschirpSynth::saveSysex(std::string const &filename, std::vector <PyTschi
 	auto pdc = midikraft::Capability::hasCapability<midikraft::ProgramDumpCabability>(synth_);
 	if (pdc) {
 		std::vector<MidiMessage> result;
+		int place = 0;
 		for (auto tschirp : patches) {
-			auto m = pdc->patchToProgramDumpSysex(*tschirp.patchPtr());
+			auto m = pdc->patchToProgramDumpSysex(tschirp.patchPtr(), MidiProgramNumber::fromZeroBase(place++));
 			std::copy(m.cbegin(), m.cend(), std::back_inserter(result));
 		}
 		Sysex::saveSysex(filename, result);
@@ -106,7 +107,7 @@ void PyTschirpSynth::saveEditBuffer(std::string const &filename, PyTschirp &patc
 {
 	auto ebc = midikraft::Capability::hasCapability<midikraft::EditBufferCapability>(synth_);
 	if (ebc) {
-		auto midiMessages = ebc->patchToSysex(*patch.patchPtr());
+		auto midiMessages = ebc->patchToSysex(patch.patchPtr());
 		Sysex::saveSysex(filename, midiMessages);
 	}
 	else {
