@@ -10,6 +10,7 @@
 
 #include "LayeredPatchCapability.h"
 #include "DetailedParametersCapability.h"
+#include "StoredPatchNameCapability.h"
 
 #include <algorithm>
 
