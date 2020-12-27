@@ -25,6 +25,11 @@ public:
 	virtual void postMessage(const String& message) override {
 		std::cout << message << std::endl;
 	}
+
+	virtual void postMessageOncePerRun(const String& message) override {
+		// ignore the once per run here
+		postMessage(message);
+	}
 };
 
 midikraft::MidiController *correctMidiController() {
