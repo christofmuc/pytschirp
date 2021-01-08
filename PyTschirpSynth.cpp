@@ -130,9 +130,9 @@ void PyTschirpSynth::getGlobalSettings()
 	auto dataFileLoad = midikraft::Capability::hasCapability<midikraft::DataFileLoadCapability>(synth_);
 	if (dataFileLoad) {
 		//TODO - how to determine the data file type for the global settings? I don't think this will work. 
-		librarian.startDownloadingSequencerData(midikraft::MidiController::instance()->getMidiOutput(midiOutput()), dataFileLoad.get(), 0, nullptr, [this, &done](std::vector<std::shared_ptr<midikraft::DataFile>>) {
+		/*librarian.startDownloadingSequencerData(midikraft::MidiController::instance()->getMidiOutput(midiOutput()), dataFileLoad.get(), 0, nullptr, [this, &done](std::vector<std::shared_ptr<midikraft::DataFile>>) {
 			done = true;
-		});
+		});*/
 	}
 	midikraft::MidiRequest::blockUntilTrue([&done]() { return done;  }, 2000);
 }
