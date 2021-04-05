@@ -99,6 +99,7 @@ PYBIND11_MODULE(pytschirp, m) {
 	if (!midikraft::MidiController::instance()) {
 		// Also, by default install a MIDI logger on stderr so we can see what is being sent and received
 		midikraft::MidiController::instance()->setMidiLogFunction([](MidiMessage const &message, String const &source, bool isOut) {
+			ignoreUnused(source);
 			py::print(isOut ? "O: " : "I: ", message.getDescription().toStdString());
 		});
 	}
