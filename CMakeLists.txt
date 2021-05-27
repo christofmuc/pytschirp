@@ -39,11 +39,11 @@ IF(UNIX)
 	# Required for the Linux version of the library to avoid a linker error when building the python module
 	set_property(TARGET pytschirplib PROPERTY POSITION_INDEPENDENT_CODE ON) 
 ENDIF()
-target_link_libraries(pytschirplib PRIVATE pybind11 juce-utils midikraft-base midikraft-librarian ${APPLE_BOOST})
+target_link_libraries(pytschirplib PRIVATE pybind11::pybind11 juce-utils midikraft-base midikraft-librarian ${APPLE_BOOST})
 target_include_directories(pytschirplib PRIVATE ${JUCE_INCLUDES})
 
 add_library(pytschirp_embedded embedded_module.cpp embedded_module.h)
-target_link_libraries(pytschirp_embedded PRIVATE pybind11 pytschirplib juce-utils midikraft-base midikraft-librarian ${SYNTHMODULES} ${APPLE_BOOST})
+target_link_libraries(pytschirp_embedded PRIVATE pybind11::embed pytschirplib juce-utils midikraft-base midikraft-librarian ${SYNTHMODULES} ${APPLE_BOOST})
 target_include_directories(pytschirp_embedded PUBLIC ${CMAKE_CURRENT_LIST_DIR} PRIVATE ${JUCE_INCLUDES})
 
 pybind11_add_module(pytschirp pytschirp.cpp)
@@ -64,10 +64,10 @@ ENDIF()
 
 add_executable(testExe test.cpp)
 IF(WIN32)	
-	target_link_libraries(testExe PRIVATE juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES})
+	target_link_libraries(testExe PRIVATE pybind11::embed juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES})
 ELSEIF(APPLE)
-	target_link_libraries(testExe PRIVATE juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES})
+	target_link_libraries(testExe PRIVATE pybind11::embed juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES})
 ELSE()
-	target_link_libraries(testExe PRIVATE juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES} ${LINUX_JUCE_LINK_LIBRARIES})
+	target_link_libraries(testExe PRIVATE pybind11::embed juce-utils midikraft-base ${SYNTHMODULES} ${JUCE_LIBRARIES} ${LINUX_JUCE_LINK_LIBRARIES})
 ENDIF()
 
