@@ -29,8 +29,8 @@ public:
 	void getGlobalSettings();
 
 private:
-	std::string midiInput() const;
-	std::string midiOutput() const;
+	juce::MidiDeviceInfo midiInput() const;
+	juce::MidiDeviceInfo midiOutput() const;
 	MidiChannel channel() const;
 
 	std::shared_ptr<midikraft::Synth> synth_;

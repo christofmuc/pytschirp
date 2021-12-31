@@ -37,7 +37,7 @@ bool PyTschirpSynth::detected()
 
 std::string PyTschirpSynth::location() const
 {
-	auto result = String("MIDI IN: ") + String(midiInput()) + String(", MIDI OUT: ") + String(midiOutput());
+	auto result = String("MIDI IN: ") + String(midiInput().identifier) + String(", MIDI OUT: ") + String(midiOutput().identifier);
 	return result.toStdString();
 }
 
@@ -137,16 +137,16 @@ void PyTschirpSynth::getGlobalSettings()
 	midikraft::MidiRequest::blockUntilTrue([&done]() { return done;  }, 2000);
 }
 
-std::string PyTschirpSynth::midiInput() const
+juce::MidiDeviceInfo PyTschirpSynth::midiInput() const
 {
 	auto midiLocation = midikraft::Capability::hasCapability<midikraft::MidiLocationCapability>(synth_);
-	return midiLocation ? midiLocation->midiInput() : "invalid";
+	return midiLocation ? midiLocation->midiInput() : MidiDeviceInfo();
 }
 
-std::string PyTschirpSynth::midiOutput() const
+juce::MidiDeviceInfo PyTschirpSynth::midiOutput() const
 {
 	auto midiLocation = midikraft::Capability::hasCapability<midikraft::MidiLocationCapability>(synth_);
-	return midiLocation ? midiLocation->midiOutput() : "invalid";
+	return midiLocation ? midiLocation->midiOutput() : MidiDeviceInfo();
 }
 
 MidiChannel PyTschirpSynth::channel() const

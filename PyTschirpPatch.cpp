@@ -142,7 +142,7 @@ std::string PyTschirp::underscoreToSpace(std::string const &input)
 	return copy;
 }
 
-std::string PyTschirp::midiInput()
+juce::MidiDeviceInfo PyTschirp::midiInput()
 {
 	if (!synth_.expired()) {
 		auto location = midikraft::Capability::hasCapability<midikraft::MidiLocationCapability>(synth_.lock());
@@ -150,10 +150,10 @@ std::string PyTschirp::midiInput()
 			return location->midiInput();
 		}
 	}
-	return "invalid";
+	return juce::MidiDeviceInfo();
 }
 
-std::string PyTschirp::midiOutput()
+juce::MidiDeviceInfo PyTschirp::midiOutput()
 {
 	if (!synth_.expired()) {
 		auto location = midikraft::Capability::hasCapability<midikraft::MidiLocationCapability>(synth_.lock());
@@ -161,7 +161,7 @@ std::string PyTschirp::midiOutput()
 			return location->midiOutput();
 		}
 	}
-	return "invalid";
+	return juce::MidiDeviceInfo();
 }
 
 bool PyTschirp::isChannelValid() const
