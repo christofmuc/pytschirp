@@ -44,7 +44,7 @@ PYBIND11_EMBEDDED_MODULE(pytschirpee, m) {
 	m.doc() = "Provide PyTschirp bindings for the KnobKraft Orm";
 
 	py::class_<PyTschirp> rev2_tschirp(m, "Patch");
-	rev2_tschirp.def(py::init<std::shared_ptr<midikraft::Patch>>())
+	rev2_tschirp.def(py::init<std::shared_ptr<midikraft::DataFile>>())
 		.def("attr", &PyTschirp::get_attr)
 		.def("__getattr__", &PyTschirp::get_attr)
 		.def("__setattr__", py::overload_cast<std::string const &, int>(&PyTschirp::set_attr))

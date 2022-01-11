@@ -12,8 +12,8 @@
 
 class PyTschirpAttribute {
 public:
-	PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, std::string const &param);
-	PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, std::string const &param, int targetLayerNo);
+	PyTschirpAttribute(std::shared_ptr<midikraft::DataFile> patch, std::string const &param);
+	PyTschirpAttribute(std::shared_ptr<midikraft::DataFile> patch, std::string const &param, int targetLayerNo);
 
 	void set(int value);
 	void set(std::vector<int> data);
@@ -28,7 +28,7 @@ public:
 private:
 	std::shared_ptr<midikraft::SynthParameterDefinition> defByName(std::string const &name) const;
 
-	std::shared_ptr<midikraft::Patch> patch_;
+	std::shared_ptr<midikraft::DataFile> patch_;
 	std::shared_ptr<midikraft::SynthParameterDefinition> def_;
 };
 

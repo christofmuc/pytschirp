@@ -16,7 +16,7 @@
 
 namespace py = pybind11;
 
-PyTschirp::PyTschirp(std::shared_ptr<midikraft::Patch> p, std::weak_ptr<midikraft::Synth> synth, int layerNo) : PyTschirp(p, synth)
+PyTschirp::PyTschirp(std::shared_ptr<midikraft::DataFile> p, std::weak_ptr<midikraft::Synth> synth, int layerNo) : PyTschirp(p, synth)
 {
 	layerNo_ = layerNo;
 
@@ -30,16 +30,11 @@ PyTschirp::PyTschirp(std::shared_ptr<midikraft::Patch> p, std::weak_ptr<midikraf
 
 PyTschirp::PyTschirp(std::shared_ptr<midikraft::DataFile> p, std::weak_ptr<midikraft::Synth> synth)
 {
-	// Downcast possible?
-	auto correctPatch = std::dynamic_pointer_cast<midikraft::Patch>(p);
-	if (!correctPatch) {
-		throw std::runtime_error("PyTschirp: Program error: Can't downcast, wrong patch type!");
-	}
-	patch_ = correctPatch;
+	patch_ = p;
 	synth_ = synth;
 }
 
-PyTschirp::PyTschirp(std::shared_ptr<midikraft::Patch> patch)
+PyTschirp::PyTschirp(std::shared_ptr<midikraft::DataFile> patch)
 {
 	patch_ = patch;
 }
@@ -86,7 +81,7 @@ void PyTschirp::set_attr(std::string const &name, int value)
 std::string PyTschirp::getName()
 {
 	if (layerNo_ == -1) {
-		return patch_->name();
+		return synth_.lock()->nameForPatch(patch_);
 	}
 	else {
 		auto layeredPatch = midikraft::Capability::hasCapability<midikraft::LayeredPatchCapability>(patch_);
@@ -130,7 +125,7 @@ std::vector<std::string> PyTschirp::parameterNames()
 	return result;
 }
 
-std::shared_ptr<midikraft::Patch> PyTschirp::patchPtr()
+std::shared_ptr<midikraft::DataFile> PyTschirp::patchPtr()
 {
 	return patch_;
 }

@@ -17,7 +17,7 @@
 
 class PyTschirp {	
 public:
-	PyTschirp(std::shared_ptr<midikraft::Patch> patch);
+	PyTschirp(std::shared_ptr<midikraft::DataFile> patch);
 	PyTschirp(std::shared_ptr<midikraft::DataFile> p, std::weak_ptr<midikraft::Synth> synth);
 
 	PyTschirpAttribute get_attr(std::string const &attrName);
@@ -35,11 +35,11 @@ public:
 	std::vector<std::string> parameterNames();
 
 	//! Use this at your own risk
-	std::shared_ptr<midikraft::Patch> patchPtr();
+	std::shared_ptr<midikraft::DataFile> patchPtr();
 
 private:
 	// Private constructor to create a layer accessing Tschirp
-	PyTschirp(std::shared_ptr<midikraft::Patch> p, std::weak_ptr<midikraft::Synth> synth, int layerNo);
+	PyTschirp(std::shared_ptr<midikraft::DataFile> p, std::weak_ptr<midikraft::Synth> synth, int layerNo);
 
 	std::string underscoreToSpace(std::string const &input);
 
@@ -47,7 +47,7 @@ private:
 	std::string midiOutput();
 	bool isChannelValid() const;
 
-	std::shared_ptr<midikraft::Patch> patch_;
+	std::shared_ptr<midikraft::DataFile> patch_;
 	std::weak_ptr<midikraft::Synth> synth_;
 	int layerNo_ = -1; // -1 means no layer is selected, access the whole patch. Else, this is the layer number this Tschirp represents
 };

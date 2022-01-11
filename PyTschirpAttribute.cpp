@@ -14,12 +14,12 @@
 
 namespace py = pybind11;
 
-PyTschirpAttribute::PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, std::string const &param) : patch_(patch)
+PyTschirpAttribute::PyTschirpAttribute(std::shared_ptr<midikraft::DataFile> patch, std::string const &param) : patch_(patch)
 {
 	def_ = defByName(param);
 }
 
-PyTschirpAttribute::PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, std::string const &param, int targetLayerNo) : patch_(patch)
+PyTschirpAttribute::PyTschirpAttribute(std::shared_ptr<midikraft::DataFile> patch, std::string const &param, int targetLayerNo) : patch_(patch)
 {
 	def_ = defByName(param);
 	auto layerAccess = midikraft::Capability::hasCapability<midikraft::SynthMultiLayerParameterCapability>(def_);
