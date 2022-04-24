@@ -53,7 +53,9 @@ PyTschirp PyTschirpSynth::editBuffer()
 		// Block until we get the edit buffer back from the synth!
 		auto request = editBufferCapability->requestEditBufferDump();
 		midikraft::MidiRequest requester(midiOutput(), request, [editBufferCapability](MidiMessage const &message) {
-			return editBufferCapability->isEditBufferDump(message);
+			//TODO - this does not seem to work for multi-message edit buffer dumps. Who should do the parsing here? 
+			// Note to myself: This needs the count of expected messages in order to make any sense...
+			return editBufferCapability->isEditBufferDump({ message });
 		});
 
 		auto editBufferMessage = requester.blockForReply();
