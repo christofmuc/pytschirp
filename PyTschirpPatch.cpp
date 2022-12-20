@@ -150,7 +150,7 @@ juce::MidiDeviceInfo PyTschirp::midiInput()
 			return location->midiInput();
 		}
 	}
-	return {};
+	return juce::MidiDeviceInfo();
 }
 
 juce::MidiDeviceInfo PyTschirp::midiOutput()
@@ -161,7 +161,7 @@ juce::MidiDeviceInfo PyTschirp::midiOutput()
 			return location->midiOutput();
 		}
 	}
-	return {};
+	return juce::MidiDeviceInfo();
 }
 
 bool PyTschirp::isChannelValid() const
