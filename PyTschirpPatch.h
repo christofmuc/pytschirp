@@ -43,8 +43,8 @@ private:
 
 	std::string underscoreToSpace(std::string const &input);
 
-	std::string midiInput();
-	std::string midiOutput();
+    juce::MidiDeviceInfo midiInput();
+    juce::MidiDeviceInfo midiOutput();
 	bool isChannelValid() const;
 
 	std::shared_ptr<midikraft::Patch> patch_;
