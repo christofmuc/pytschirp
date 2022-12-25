@@ -86,7 +86,10 @@ void PyTschirp::set_attr(std::string const &name, int value)
 std::string PyTschirp::getName()
 {
 	if (layerNo_ == -1) {
-		return patch_->name();
+		if (!synth_.expired())
+			return synth_.lock()->nameForPatch(patch_);
+		else
+			return "synth expired";
 	}
 	else {
 		auto layeredPatch = midikraft::Capability::hasCapability<midikraft::LayeredPatchCapability>(patch_);
