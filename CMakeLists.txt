@@ -39,16 +39,11 @@ IF(UNIX)
 	# Required for the Linux version of the library to avoid a linker error when building the python module
 	set_property(TARGET pytschirplib PROPERTY POSITION_INDEPENDENT_CODE ON) 
 ENDIF()
-IF(WIN32)
-ELSE()
-	SET(PYTHON3_TARGET Python3::Python)
-ENDIF()
-
-target_link_libraries(pytschirplib PRIVATE pybind11::pybind11 ${PYTHON3_TARGET} juce-utils midikraft-base midikraft-librarian)
+target_link_libraries(pytschirplib PRIVATE pybind11::pybind11 juce-utils midikraft-base midikraft-librarian)
 target_include_directories(pytschirplib PRIVATE ${JUCE_INCLUDES})
 
 add_library(pytschirp_embedded embedded_module.cpp embedded_module.h)
-target_link_libraries(pytschirp_embedded PRIVATE pybind11::embed ${PYTHON3_TARGET} pytschirplib juce-utils midikraft-base midikraft-librarian ${SYNTHMODULES})
+target_link_libraries(pytschirp_embedded PRIVATE pybind11::embed pytschirplib juce-utils midikraft-base midikraft-librarian ${SYNTHMODULES})
 target_include_directories(pytschirp_embedded PUBLIC ${CMAKE_CURRENT_LIST_DIR} PRIVATE ${JUCE_INCLUDES})
 
 pybind11_add_module(pytschirp pytschirp.cpp)
