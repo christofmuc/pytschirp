@@ -106,7 +106,7 @@ void PyTschirp::setName(std::string const &newName)
 {
 	auto storedName = midikraft::Capability::hasCapability<midikraft::StoredPatchNameCapability>(patch_);
 	if (patch_) {
-		storedName->setName(newName);
+		storedName->changeNameStoredInPatch(newName);
 	}
 }
 
