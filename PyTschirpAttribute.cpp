@@ -22,7 +22,7 @@ PyTschirpAttribute::PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, 
 PyTschirpAttribute::PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, std::string const &param, int targetLayerNo) : patch_(patch)
 {
 	def_ = defByName(param);
-	auto layerAccess = midikraft::Capability::hasCapability<midikraft::SynthMultiLayerParameterCapability>(def_);
+	auto layerAccess = def_->getCapability<midikraft::SynthMultiLayerParameterCapability>();
 	if (!layerAccess) {
 		throw std::runtime_error("PyTschirp: Program Error: Parameter set does not support multi layers");
 	}
@@ -33,7 +33,7 @@ PyTschirpAttribute::PyTschirpAttribute(std::shared_ptr<midikraft::Patch> patch, 
 
 void PyTschirpAttribute::set(int value)
 {
-	auto intParam = midikraft::Capability::hasCapability<midikraft::SynthIntParameterCapability>(def_);
+	auto intParam = def_->getCapability<midikraft::SynthIntParameterCapability>();
 	if (intParam) {
 		intParam->setInPatch(*patch_, value);
 	}
@@ -44,7 +44,7 @@ void PyTschirpAttribute::set(int value)
 
 void PyTschirpAttribute::set(std::vector<int> data)
 {
-	auto vectorParam = midikraft::Capability::hasCapability<midikraft::SynthVectorParameterCapability>(def_);
+	auto vectorParam = def_->getCapability<midikraft::SynthVectorParameterCapability>();
 	if (vectorParam) {
 		vectorParam->setInPatch(*patch_, data);
 	}
@@ -61,7 +61,7 @@ py::object PyTschirpAttribute::get() const
 	if ((def_->type() == midikraft::SynthParameterDefinition::ParamType::INT_ARRAY)
 		|| (def_->type() == midikraft::SynthParameterDefinition::ParamType::LOOKUP_ARRAY))
 	{
-		auto vectorParam = midikraft::Capability::hasCapability<midikraft::SynthVectorParameterCapability>(def_);
+		auto vectorParam = def_->getCapability<midikraft::SynthVectorParameterCapability>();
 		if (vectorParam) {
 			std::vector<int> value;
 			if (!vectorParam->valueInPatch(*patch_, value)) {
@@ -76,7 +76,7 @@ py::object PyTschirpAttribute::get() const
 		}
 	}
 	else {
-		auto intParam = midikraft::Capability::hasCapability<midikraft::SynthIntParameterCapability>(def_);
+		auto intParam = def_->getCapability<midikraft::SynthIntParameterCapability>();
 		if (intParam) {
 			int value;
 			if (intParam->valueInPatch(*patch_, value)) {
@@ -108,7 +108,7 @@ std::shared_ptr <midikraft::SynthParameterDefinition> PyTschirpAttribute::def()
 
 std::shared_ptr<midikraft::SynthParameterDefinition> PyTschirpAttribute::defByName(std::string const &name) const
 {
-	auto params = midikraft::Capability::hasCapability<midikraft::DetailedParametersCapability>(patch_);
+	auto params = patch_->getCapability<midikraft::DetailedParametersCapability>();
 	if (params) {
 		for (auto param : params->allParameterDefinitions()) {
 			if (param->name() == name) {

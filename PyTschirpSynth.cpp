@@ -48,7 +48,7 @@ PyTschirp PyTschirpSynth::editBuffer()
 	}
 
 	// Let's see if this is possible
-	auto editBufferCapability = midikraft::Capability::hasCapability<midikraft::EditBufferCapability>(synth_);
+	auto editBufferCapability = synth_->getCapability<midikraft::EditBufferCapability>();
 	if (editBufferCapability) {
 		// Block until we get the edit buffer back from the synth!
 		auto request = editBufferCapability->requestEditBufferDump();
@@ -90,7 +90,7 @@ std::vector<PyTschirp> PyTschirpSynth::loadSysex(std::string const &filename)
 
 void PyTschirpSynth::saveSysex(std::string const &filename, std::vector <PyTschirp> &patches)
 {
-	auto pdc = midikraft::Capability::hasCapability<midikraft::ProgramDumpCabability>(synth_);
+	auto pdc = synth_->getCapability<midikraft::ProgramDumpCabability>();
 	if (pdc) {
 		std::vector<MidiMessage> result;
 		int place = 0;
@@ -107,7 +107,7 @@ void PyTschirpSynth::saveSysex(std::string const &filename, std::vector <PyTschi
 
 void PyTschirpSynth::saveEditBuffer(std::string const &filename, PyTschirp &patch)
 {
-	auto ebc = midikraft::Capability::hasCapability<midikraft::EditBufferCapability>(synth_);
+	auto ebc = synth_->getCapability<midikraft::EditBufferCapability>();
 	if (ebc) {
 		auto midiMessages = ebc->patchToSysex(patch.patchPtr());
 		Sysex::saveSysex(filename, midiMessages);
@@ -129,7 +129,7 @@ void PyTschirpSynth::getGlobalSettings()
 	midikraft::Librarian librarian(synths);
 	bool done = false;
 
-	auto dataFileLoad = midikraft::Capability::hasCapability<midikraft::DataFileLoadCapability>(synth_);
+	auto dataFileLoad = synth_->getCapability<midikraft::DataFileLoadCapability>();
 	if (dataFileLoad) {
 		//TODO - how to determine the data file type for the global settings? I don't think this will work. 
 		/*librarian.startDownloadingSequencerData(midikraft::MidiController::instance()->getMidiOutput(midiOutput()), dataFileLoad.get(), 0, nullptr, [this, &done](std::vector<std::shared_ptr<midikraft::DataFile>>) {
@@ -141,18 +141,18 @@ void PyTschirpSynth::getGlobalSettings()
 
 juce::MidiDeviceInfo PyTschirpSynth::midiInput() const
 {
-	auto midiLocation = midikraft::Capability::hasCapability<midikraft::MidiLocationCapability>(synth_);
+	auto midiLocation = synth_->getCapability<midikraft::MidiLocationCapability>();
 	return midiLocation ? midiLocation->midiInput() : MidiDeviceInfo();
 }
 
 juce::MidiDeviceInfo PyTschirpSynth::midiOutput() const
 {
-	auto midiLocation = midikraft::Capability::hasCapability<midikraft::MidiLocationCapability>(synth_);
+	auto midiLocation = synth_->getCapability<midikraft::MidiLocationCapability>();
 	return midiLocation ? midiLocation->midiOutput() : MidiDeviceInfo();
 }
 
 MidiChannel PyTschirpSynth::channel() const
 {
-	auto midiLocation = midikraft::Capability::hasCapability<midikraft::MidiLocationCapability>(synth_);
+	auto midiLocation = synth_->getCapability<midikraft::MidiLocationCapability>();
 	return midiLocation ? midiLocation->channel() : MidiChannel::invalidChannel();
 }
