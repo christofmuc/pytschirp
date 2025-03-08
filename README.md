@@ -28,7 +28,7 @@ The pytschirp module provides three different main classes that can be used to m
 
   1. A `Synthesizer` class representing the MIDI synth that you want to acesss. Note that this is a high level implementation of a specific synth like the Sequential DSI Prophet Rev 2, not a low level implementation where you have to deal with MIDI bytes, hexdumps, and sysex codes.
   2. A `Patch` class that represents one single patch (tone/program/...) of the synthesizer.
-  3. A `PatchAttribute` class that represents one of the many parameters of a concrete Patch, and this PatchAttribute can be used to retrieve the value or modify a Patch. If the Patch was retrieved from a live device, the modifcation of the PatchAtribute at the same time changes the attribute on the live device (via MIDI).
+  3. A `PatchAttribute` class that represents one of the many parameters of a concrete Patch, and this PatchAttribute can be used to retrieve the value or modify a Patch. If the Patch was retrieved from a live device, the modification of the PatchAtribute at the same time changes the attribute on the live device (via MIDI).
 
 ## Synthesizer class
 
